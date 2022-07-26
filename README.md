@@ -1,4 +1,4 @@
-# Large Tether Transfer Agent
+# MakerDAO’s Bridge Invariant Agent
 
 ## Description
 
