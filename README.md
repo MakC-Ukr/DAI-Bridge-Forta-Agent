@@ -11,7 +11,7 @@ This agent **detects the following condition** for the DAI token Bridge recently
 - Ethereum/Arbitrum
 
 In order to change to Arbitrum, the `OPvsARB` variable (line 19) in `./src/agent.ts` showuld be set to `false`.
-In order to change to Ootimism, the `OPvsARB` variable (line 19) in `./src/agent.ts` showuld be set to `true`.
+In order to change to Optimism, the `OPvsARB` variable (line 19) in `./src/agent.ts` showuld be set to `true`.
 
 ## Alerts
 
