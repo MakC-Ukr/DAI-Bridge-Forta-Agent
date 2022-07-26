@@ -2,23 +2,25 @@
 
 ## Description
 
-This agent detects transactions with large Tether transfers
+This agent **detects the following condition** for the DAI token Bridge recently launched onO Optimism: 
+`L1DAI.balanceOf(L1Escrow) ≥ L2DAI.totalSupply()`
 
 ## Supported Chains
 
-- Ethereum
-- List any other chains this agent can support e.g. BSC
+- Ethereum/Optimism
+- Ethereum/Arbitrum
+
+In order to change to Arbitrum, the `OPvsARB` variable (line 19) in `./src/agent.ts` showuld be set to `false`.
+In order to change to Ootimism, the `OPvsARB` variable (line 19) in `./src/agent.ts` showuld be set to `true`.
 
 ## Alerts
 
 Describe each of the type of alerts fired by this agent
 
-- FORTA-1
-  - Fired when a transaction contains a Tether transfer over 10,000 USDT
-  - Severity is always set to "low" (mention any conditions where it could be something else)
-  - Type is always set to "info" (mention any conditions where it could be something else)
-  - Mention any other type of metadata fields included with this alert
-
+- OP_DAI_BRIDGE-1
+  - Fired when the condition `L1DAI.balanceOf(L1Escrow) ≥ L2DAI.totalSupply()` holds true for an Ethereum block
+  - Severity is always set to "High" 
+  - Type is always set to "Suspicious"
 ## Test Data
 
 The agent behaviour can be verified with the following transactions:
