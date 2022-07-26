@@ -1,4 +1,4 @@
-# MakerDAO’s Bridge Invariant Agent
+# MakerDAO’s Bridge Alert Agent
 
 ## Description
 
