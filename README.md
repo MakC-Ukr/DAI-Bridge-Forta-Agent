@@ -23,6 +23,4 @@ Describe each of the type of alerts fired by this agent
   - Type is always set to "Suspicious"
 ## Test Data
 
-The agent behaviour can be verified with the following transactions:
-
-- 0x3a0f757030beec55c22cbc545dd8a844cbbb2e6019461769e1bc3f3a95d10826 (15,000 USDT)
+The agent behaviour can be verified  any blocks fro Ethereum history till now. For e.g. "npm run block 15216828"

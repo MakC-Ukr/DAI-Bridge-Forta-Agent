@@ -2,8 +2,6 @@ import {
   BlockEvent,
   Finding,
   HandleBlock,
-  HandleTransaction,
-  TransactionEvent,
   FindingSeverity,
   FindingType,
   getJsonRpcUrl,
