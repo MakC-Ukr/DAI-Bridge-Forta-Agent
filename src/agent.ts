@@ -9,6 +9,42 @@ import {
 var ethers = require("ethers");
 import dataJson from "./data.json";
 
+/*
+
+                            ARCHITECTURE
+    1. Check if we are on main chain
+        a. On L2 => send an alert related to DAI address with L2 totalSupply()
+        b. On L1 => get locked balance on L1 => get the most recent alert related to L2 DAI's contract address 
+        => compare both => send alert
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
 // initialising DAI contract on L1
 let provider = new ethers.providers.JsonRpcProvider(getJsonRpcUrl());
 let DAI_L1 = new ethers.Contract(dataJson.DAI_L1_ADDRESS, dataJson.Erc20_ABI, provider);
