@@ -5,64 +5,39 @@ import {
   HandleTransaction,
   TransactionEvent,
   FindingSeverity,
+  getJsonRpcUrl,
   FindingType,
 } from "forta-agent";
+var ethers = require("ethers");
+import { DAI_L2_ADDRESS, ERC20_ABI, CHAIN_ID_BOT } from "./constants";
 
-export const ERC20_TRANSFER_EVENT =
-  "event Transfer(address indexed from, address indexed to, uint256 value)";
-export const TETHER_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
-export const TETHER_DECIMALS = 6;
-let findingsCount = 0;
+export function provideHandleBlock(DaiL2Address: string, erc20Abi: any[], chainIdBot: string): HandleBlock {
+  let provider = new ethers.providers.JsonRpcProvider(getJsonRpcUrl());
+  let DAI_L2 = new ethers.Contract(DaiL2Address, erc20Abi, provider);
 
-const handleTransaction: HandleTransaction = async (
-  txEvent: TransactionEvent
-) => {
-  const findings: Finding[] = [];
-
-  // limiting this agent to emit only 5 findings so that the alert feed is not spammed
-  if (findingsCount >= 5) return findings;
-
-  // filter the transaction logs for Tether transfer events
-  const tetherTransferEvents = txEvent.filterLog(
-    ERC20_TRANSFER_EVENT,
-    TETHER_ADDRESS
-  );
-
-  tetherTransferEvents.forEach((transferEvent) => {
-    // extract transfer event arguments
-    const { to, from, value } = transferEvent.args;
-    // shift decimals of transfer value
-    const normalizedValue = value.div(10 ** TETHER_DECIMALS);
-
-    // if more than 10,000 Tether were transferred, report it
-    if (normalizedValue.gt(10000)) {
-      findings.push(
-        Finding.fromObject({
-          name: "High Tether Transfer",
-          description: `High amount of USDT transferred: ${normalizedValue}`,
-          alertId: "FORTA-1",
-          severity: FindingSeverity.Low,
-          type: FindingType.Info,
-          metadata: {
-            to,
-            from,
-          },
-        })
-      );
-      findingsCount++;
-    }
-  });
-
-  return findings;
-};
-
-// const handleBlock: HandleBlock = async (blockEvent: BlockEvent) => {
-//   const findings: Finding[] = [];
-//   // detect some block condition
-//   return findings;
-// }
+  return async (blockEvent: BlockEvent) => {
+    let L2_totalSupply = parseFloat(await DAI_L2.totalSupply()) / Math.pow(10, 18);
+    const findings: Finding[] = [];
+    findings.push(
+      Finding.fromObject({
+        name: "DAI balance update",
+        description: `Returns the total supply of L2 Optimism DAI tokens`,
+        alertId: "OP_DAI_SUPPLY-1",
+        severity: FindingSeverity.Low,
+        type: FindingType.Info,
+        protocol: "MakerDAO",
+        metadata: {
+          blockNumber: blockEvent.blockNumber.toString(),
+          blockHash: blockEvent.blockHash,
+          chainId: chainIdBot,
+          totalSupplyDAI: L2_totalSupply.toString(),
+        },
+      })
+    );
+    return findings;
+  };
+}
 
 export default {
-  handleTransaction,
-  // handleBlock
+  handleBlock: provideHandleBlock(DAI_L2_ADDRESS, ERC20_ABI, CHAIN_ID_BOT),
 };
