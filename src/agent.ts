@@ -2,86 +2,124 @@ import {
   BlockEvent,
   Finding,
   HandleBlock,
+  HandleTransaction,
+  TransactionEvent,
   FindingSeverity,
   FindingType,
-  getJsonRpcUrl,
 } from "forta-agent";
-var ethers = require("ethers");
+import axios from "axios";
 import dataJson from "./data.json";
 
-/*
+const QUERY: string = `query recentAlerts {
+  alerts(
+    input: {
+      first: 100
+      blockDateRange: {
+        startDate: "2022-07-29",
+        endDate: "2022-07-29"
+      }
+      bots: [
+  "0x5326aeca48c7306e1e628819a8f0336652bbaf9f6ec91c1075b7cedc375133c5"
+      ]
+      chainId: 1
+    }
+  ) {
+    pageInfo {
+      hasNextPage
+    }
+    alerts {
+      createdAt
+      name
+      protocol
+    }
+  }
+}`
 
-                            ARCHITECTURE
-    1. Check if we are on main chain
-        a. On L2 => send an alert related to DAI address with L2 totalSupply()
-        b. On L1 => get locked balance on L1 => get the most recent alert related to L2 DAI's contract address 
-        => compare both => send alert
+const constVars = {
+  input: {
+    first: 10,
+    bots: ["0x5326aeca48c7306e1e628819a8f0336652bbaf9f6ec91c1075b7cedc375133c5"],
+    chainId: 1,
+    blockDateRange: {
+      startDate: "2022-07-29",
+      endDate: "2022-07-29",
+    }
+  }
+  };
 
+export const ERC20_TRANSFER_EVENT =
+  "event Transfer(address indexed from, address indexed to, uint256 value)";
+export const TETHER_ADDRESS = "0xdAC17F958D2ee523a2206206994597C13D831ec7";
+export const TETHER_DECIMALS = 6;
+let findingsCount = 0;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-// initialising DAI contract on L1
-let provider = new ethers.providers.JsonRpcProvider(getJsonRpcUrl());
-let DAI_L1 = new ethers.Contract(dataJson.DAI_L1_ADDRESS, dataJson.Erc20_ABI, provider);
-
-// initialising DAI contract on L2
-var OPvsARB = false;
-
-let ESCROW_ADDRESS_L1 = OPvsARB ? dataJson.L1_ESCROW_ADDRESS_OP : dataJson.L1_ESCROW_ADDRESS_ARB;
-let DAI_ADDRESS_L2 = OPvsARB ? dataJson.DAI_L2_ADDRES_OP : dataJson.DAI_L2_ADDRES_ARB;
-let RPC_LINK_L2 = OPvsARB ? dataJson.OptimismRpc : dataJson.ArbitrumRpc;
-
-let l2_provider = new ethers.providers.JsonRpcProvider(RPC_LINK_L2);
-let DAI_L2 = new ethers.Contract(DAI_ADDRESS_L2, dataJson.Erc20_ABI, l2_provider);
-
-const handleBlock: HandleBlock = async (blockEvent: BlockEvent) => {
+const func = async () => {
+  const resp = await axios.post(
+    dataJson.API_URL,
+    {
+      query: QUERY,
+      variables: constVars
+    },
+    {
+      headers: {
+        "content-type": "application/json",
+      },
+    }
+    );
+    console.log(resp['data']['data']['alerts']);
+  }
+  
+  const handleTransaction: HandleTransaction = async (
+    txEvent: TransactionEvent
+    ) => {
   const findings: Finding[] = [];
 
-  let escrowBal = parseFloat(await DAI_L1.balanceOf(ESCROW_ADDRESS_L1)) / Math.pow(10, 18);
-  let L2_totalSupply = parseFloat(await DAI_L2.totalSupply()) / Math.pow(10, 18);
+  // limiting this agent to emit only 5 findings so that the alert feed is not spammed
+  if (findingsCount >= 5) return findings;
 
-  if (L2_totalSupply >= escrowBal) {
-    findings.push(
-      Finding.fromObject({
-        name: "DAI balance LOW",
-        description: `DAI balance of the L1 escrow account for Optimism DAI bridge is less than total_supply of DAI on L2.`,
-        alertId: "OP_DAI_BRIDGE-1",
-        severity: FindingSeverity.High,
-        type: FindingType.Suspicious,
-        metadata: {},
-      })
-    );
-  }
+  // filter the transaction logs for Tether transfer events
+  const tetherTransferEvents = txEvent.filterLog(
+    ERC20_TRANSFER_EVENT,
+    TETHER_ADDRESS
+  );
+
+  await func();
+
+  tetherTransferEvents.forEach((transferEvent) => {
+    // extract transfer event arguments
+    const { to, from, value } = transferEvent.args;
+    // shift decimals of transfer value
+    const normalizedValue = value.div(10 ** TETHER_DECIMALS);
+
+    // if more than 10,000 Tether were transferred, report it
+    if (normalizedValue.gt(10000)) {
+      findings.push(
+        Finding.fromObject({
+          name: "High Tether Transfer",
+          description: `High amount of USDT transferred: ${normalizedValue}`,
+          alertId: "FORTA-1",
+          severity: FindingSeverity.Low,
+          type: FindingType.Info,
+          metadata: {
+            to,
+            from,
+          },
+        })
+      );
+      findingsCount++;
+    }
+  });
 
   return findings;
 };
 
+// const handleBlock: HandleBlock = async (blockEvent: BlockEvent) => {
+//   const findings: Finding[] = [];
+//   // detect some block condition
+//   return findings;
+// }
+
 export default {
-  // handleTransaction,
-  handleBlock,
+  handleTransaction,
+  // handleBlock
 };

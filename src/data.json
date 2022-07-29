@@ -7,4 +7,5 @@
     "Erc20_ABI" : [{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}, {"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}],
     "OptimismRpc":"https://optimism-mainnet.infura.io/v3/3653806d884b401498e7a07f3f325d2e",
     "ArbitrumRpc":"https://arbitrum-mainnet.infura.io/v3/3653806d884b401498e7a07f3f325d2e",
+    "API_URL" : "https://api.forta.network/graphql"
 }
