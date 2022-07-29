@@ -1,7 +1,7 @@
 {
-  "name": "forta-agent-starter",
+  "name": "dai-op-supply-checker",
   "repository":"https://github.com/MakC-Ukr/dai_bridge-forta-agent",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Forta bot for informing about total supply of DAI tokens on L2",
   "chainIds": [
     10
