@@ -1,8 +1,0 @@
-1. L1Escrow code - https://github.com/makerdao/optimism-dai-bridge/blob/master/contracts/l1/L1Escrow.sol
-2. L1DATTokenBridge - https://github.com/makerdao/optimism-dai-bridge/blob/master/contracts/l1/L1DAITokenBridge.sol
-3. CrossDomainEnabled - https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts/contracts/libraries/bridge/CrossDomainEnabled.sol
-
-List of messegners and addresses deployed on Optimism : https://github.com/ethereum-optimism/optimism/tree/develop/packages/contracts/deployments/mainnet
-
-optimistic kovan DAI address: 0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1
-
