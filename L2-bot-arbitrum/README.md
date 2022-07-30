@@ -1,8 +1,8 @@
-# Large Tether Transfer Agent
+# Alert bot to inform of total supply of DAI on Arbitrum
 
 ## Description
 
-This agent detects transactions with large Tether transfers
+This bot returns the `totalSupply` of DAI tokens on Arbitrum chain. 
 
 ## Supported Chains
 
@@ -10,16 +10,17 @@ This agent detects transactions with large Tether transfers
 
 ## Alerts
 
-Describe each of the type of alerts fired by this agent
-
-- FORTA-1
-  - Fired when a transaction contains a Tether transfer over 10,000 USDT
+- ARB_DAI_SUPPLY-1
+  - Fired on every block
   - Severity is always set to "low" (mention any conditions where it could be something else)
   - Type is always set to "info" (mention any conditions where it could be something else)
-  - Mention any other type of metadata fields included with this alert
+  - Metadata includes:
+    - `blockNumber`: block number on L2 when the alert was triggered
+    - `blockHash` : block hash on L2 when the alert was triggered
+    - `chainId` : chain ID of the L2
+    - `totalSupplyDAI` : the returned value of total minted supply of DAI on the L2
 
 ## Test Data
 
-The agent behaviour can be verified with the following transactions:
-
-- 0x3a0f757030beec55c22cbc545dd8a844cbbb2e6019461769e1bc3f3a95d10826 (15,000 USDT)
+The bot behaviour can be verified with the following blocks:
+- [18934566](https://arbiscan.io/block/18934566)
