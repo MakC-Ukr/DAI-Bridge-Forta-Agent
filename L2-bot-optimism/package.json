@@ -1,6 +1,6 @@
 {
   "name": "dai-op-supply-checker",
-  "repository":"https://github.com/MakC-Ukr/dai_bridge-forta-agent",
+  "repository":"https://github.com/MakC-Ukr/dai_bridge-forta-agent/tree/master/L2-bot-optimism",
   "version": "0.0.5",
   "description": "Forta bot for informing about total supply of DAI tokens on L2",
   "chainIds": [
