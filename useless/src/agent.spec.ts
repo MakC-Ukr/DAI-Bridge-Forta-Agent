@@ -10,7 +10,7 @@ import agent, {
   ERC20_TRANSFER_EVENT,
   TETHER_ADDRESS,
   TETHER_DECIMALS,
-} from "./agent";
+} from "./agent-x";
 
 describe("high tether transfer agent", () => {
   let handleTransaction: HandleTransaction;

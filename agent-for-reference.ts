@@ -8,7 +8,7 @@ import {
   FindingType,
 } from "forta-agent";
 import axios from "axios";
-import dataJson from "./data.json";
+import dataJson from "./useless/src/data.json";
 
 const QUERY: string = `query recentAlerts {
   alerts(

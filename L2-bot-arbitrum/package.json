@@ -1,10 +1,10 @@
 {
-  "name": "dai-op-supply-checker",
-  "repository":"https://github.com/MakC-Ukr/dai_bridge-forta-agent",
-  "version": "0.0.2",
-  "description": "Forta bot for informing about total supply of DAI tokens on L2",
+  "name": "dai-arb-supply-checker",
+  "repository":"https://github.com/MakC-Ukr/dai_bridge-forta-agent/tree/master/L2-bot-arbitrum",
+  "version": "0.0.1",
+  "description": "Forta bot for informing about total supply of DAI tokens on Arbitrum",
   "chainIds": [
-    10
+    42161
   ],
   "scripts": {
     "build": "tsc",

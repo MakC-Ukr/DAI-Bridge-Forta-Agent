@@ -21,8 +21,8 @@ export function provideHandleBlock(DaiL2Address: string, erc20Abi: any[], chainI
     findings.push(
       Finding.fromObject({
         name: "DAI balance update",
-        description: `Returns the total supply of L2 Optimism DAI tokens`,
-        alertId: "OP_DAI_SUPPLY-1",
+        description: `Returns the total supply of L2 Arbitrum DAI tokens`,
+        alertId: "ARB_DAI_SUPPLY-1",
         severity: FindingSeverity.Low,
         type: FindingType.Info,
         protocol: "MakerDAO",

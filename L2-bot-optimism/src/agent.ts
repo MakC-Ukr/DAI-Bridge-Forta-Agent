@@ -38,8 +38,6 @@ export function provideHandleBlock(DaiL2Address: string, erc20Abi: any[], chainI
   };
 }
 
-
-
 export default {
   handleBlock: provideHandleBlock(DAI_L2_ADDRESS, ERC20_ABI, CHAIN_ID_BOT),
 };
