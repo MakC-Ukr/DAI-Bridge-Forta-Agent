@@ -19,3 +19,7 @@ L1DAI.balanceOf(L1Escrow) ≥ L2DAI.totalSupply()
 - Make the bot emit the appropriate alerts on L1 and on L2.
 - Avoid using a hardcoded endpoint
 - Improve the performance of the bot as much as possible.
+
+
+### Bots
+There are 2 bots deployed on two L2's: one is [deployed](https://explorer.forta.network/bot/0xe83234e6d5182610b4165bccb1b0dcf29c4582a18cf0c097bfc1d056edbe07b3) on Arbitrum and the other is [deployed](https://explorer.forta.network/bot/0x4ee97e15449fe5c14fd556f2b8a51a41f826f9c8df189d4328e92fa955a703dd) on Optimism. The respective bots' code is in `./L2-bot-arbitrum` and `./L2-bot-optimism` repositories. The main router bot is [deployed](https://explorer.forta.network/bot/0xda07e20f41b66467c8e16dbfda9ed047570a4dd43becf760d54db866695427ca) for mainnet and is the one that issues the High Severity alerts when the condition mentioned [here](https://github.com/MakC-Ukr/dai_bridge-forta-agent#dai-bridge-challenge) becomes true.
