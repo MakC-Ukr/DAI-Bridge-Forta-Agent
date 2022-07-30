@@ -58,9 +58,9 @@ export function provideHandleBlock(
             Finding.fromObject({
               name: alertName,
               description: "DAI balance of L1 escrow for " +chainName+ " DAI bridge less than DAI supply on L2",
-              alertId: "Dai Bridged Balance Checker",
+              alertId: "DAI_BALANCE-1",
               severity: FindingSeverity.High,
-              type: FindingType.Suspicious,
+              type: FindingType.Exploit,
               protocol: "MakerDAO (mainnet)",
               metadata: {
                 escrowBal: escrowBal.toString(),
