@@ -2,7 +2,7 @@
 
 ## Description
 
-This agent detects checks if the L2 total supply of DAI is less than the amount of DAI deposited on L1 escrow for MakerDAO
+This bot detects checks if the L2 total supply of DAI is less than the amount of DAI deposited on L1 escrow for MakerDAO
 
 ## Supported Chains
 
@@ -10,7 +10,7 @@ This agent detects checks if the L2 total supply of DAI is less than the amount 
 
 ## Alerts
 
-Describe each of the type of alerts fired by this agent
+Describe each of the type of alerts fired by this bot
 
 - DAI_BALANCE-1
   - Fired when the total supply of DAI minted on L2 (Arbitrum/Optimism) becomes more than the amount of DAI locked in the respective L1 escrow
@@ -24,5 +24,5 @@ Describe each of the type of alerts fired by this agent
 
 ## Test Data
 
-The agent behaviour can be verified with the following blocks:
+The bot behaviour can be verified with the following blocks:
 15243057
