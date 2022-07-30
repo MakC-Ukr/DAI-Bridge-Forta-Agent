@@ -6,7 +6,7 @@ This bot returns the `totalSupply` of DAI tokens on Arbitrum chain.
 
 ## Supported Chains
 
-- Optimism
+- Arbitrum
 
 ## Alerts
 
