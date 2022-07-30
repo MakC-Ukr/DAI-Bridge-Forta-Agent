@@ -49,7 +49,7 @@ export function provideHandleBlock(
         let flag = false;
         let L2_metadata = await func(i);
 
-        if(parseFloat(L2_metadata['totalSupplyDai']) <= escrowBal)
+        if(parseFloat(L2_metadata['totalSupplyDai']) > escrowBal)
           flag = true;
 
         if (flag) {
