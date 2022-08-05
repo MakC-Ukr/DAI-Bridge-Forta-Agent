@@ -18,6 +18,8 @@ import {
   HEADERS,
 } from "./constants";
 import axios from "axios";
+import { JsonRpcProvider } from "@ethersproject/providers";
+import { apiCallL1, findingPusherL1 } from "./helperL1";
 
 export function provideHandleBlock(
   DaiL1Address: string,
@@ -29,57 +31,44 @@ export function provideHandleBlock(
   queryArb: string,
   headers: {}
 ): HandleBlock {
-  const func = async (i: number) => {
-    const resp = await axios.post(
-      apiUrl,
-      {
-        query: i === 0 ? queryOp : queryArb,
-      },
-      { headers: headers }
-    );
-    return resp["data"]["data"]["alerts"]["alerts"][0]["metadata"];
-  };
-
-  let provider = new ethers.providers.JsonRpcProvider(getJsonRpcUrl());
-  let DAI_L1 = new ethers.Contract(DaiL1Address, erc20Abi, provider);
-
   return async (_: BlockEvent) => {
     const findings: Finding[] = [];
-    for (let i = 0; i < 2; i++) {
-      const chainName = i === 0 ? "Optimism" : "Arbitrum";
-      let escrowBal =
-        parseFloat(
-          await DAI_L1.balanceOf(
-            i === 0 ? l1EscrowAddressOp : l1EscrowAddressArb
-          )
-        ) / Math.pow(10, 18);
-      let flag = false;
-      let L2_metadata = await func(i);
+    let provider: JsonRpcProvider = new ethers.providers.JsonRpcProvider(
+      getJsonRpcUrl()
+    );
+    let currChainId = (await provider._networkPromise).chainId;
 
-      if (parseFloat(L2_metadata["totalSupplyDai"]) > escrowBal) flag = true;
-
-      if (flag) {
-        const alertName =
-          i === 0 ? "OP: DAI L1 less than L2" : "AB: DAI L1 less than L2";
-        findings.push(
-          Finding.fromObject({
-            name: alertName,
-            description:
-              "DAI balance of L1 escrow for " +
-              chainName +
-              " DAI bridge less than DAI supply on L2",
-            alertId: "DAI_BALANCE-1",
-            severity: FindingSeverity.High,
-            type: FindingType.Exploit,
-            protocol: "MakerDAO (mainnet)",
-            metadata: {
-              escrowBal: escrowBal.toString(),
-              L2_sup: L2_metadata["totalSupplyDai"].toString(),
-              L2_chainId: L2_metadata["chainId"],
-              L2_chainName: i === 0 ? "Optimism" : "Arbitrum",
-            },
-          })
+    if (currChainId == 1) {
+      let DAI_L1 = new ethers.Contract(DaiL1Address, erc20Abi, provider);
+      for (let i = 0; i < 2; i++) {
+        const chainName = i === 0 ? "Optimism" : "Arbitrum";
+        let escrowBal =
+          parseFloat(
+            await DAI_L1.balanceOf(
+              i === 0 ? l1EscrowAddressOp : l1EscrowAddressArb
+            )
+          ) / Math.pow(10, 18);
+        let flag = false;
+        let L2_metadata = await apiCallL1(
+          i,
+          apiUrl,
+          queryArb,
+          queryOp,
+          headers
         );
+
+        if (parseFloat(L2_metadata["totalSupplyDai"]) <= escrowBal) flag = true;
+
+        if (flag) {
+          findingPusherL1(
+            i,
+            findings,
+            chainName,
+            escrowBal,
+            L2_metadata["totalSupplyDai"].toString(),
+            L2_metadata["chainId"]
+          );
+        }
       }
     }
     return findings;
