@@ -5,15 +5,7 @@ const L1_ESCROW_ADDRESS_ARB: string =
   "0xA10c7CE4b876998858b1a9E12b10092229539400";
 const API_URL: string = "https://api.forta.network/graphql";
 const ERC20_ABI: any[] = [
-  {
-    constant: true,
-    inputs: [{ internalType: "address", name: "", type: "address" }],
-    name: "balanceOf",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
+  "function balanceOf(address) view returns (uint)",
   "function totalSupply() view returns (uint)",
 ];
 
