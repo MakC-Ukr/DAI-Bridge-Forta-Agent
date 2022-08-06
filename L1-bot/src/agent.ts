@@ -5,6 +5,7 @@ import {
   FindingSeverity,
   getJsonRpcUrl,
   FindingType,
+  getEthersProvider
 } from "forta-agent";
 var ethers = require("ethers");
 import {
@@ -16,8 +17,28 @@ import {
   QUERY_OP,
   QUERY_ARB,
   HEADERS,
+  DAI_L2_ADDRESS,
 } from "./constants";
 import axios from "axios";
+import { JsonRpcProvider } from "@ethersproject/providers";
+
+async function func(
+  i: number,
+  apiUrl: string,
+  queryArb: string,
+  queryOp: string,
+  headers: {}
+) {
+  const resp = await axios.post(
+    apiUrl,
+    {
+      query: i === 0 ? queryOp : queryArb,
+    },
+    { headers: headers }
+  );
+  return resp["data"]["data"]["alerts"]["alerts"][0]["metadata"];
+};
+
 
 export function provideHandleBlock(
   DaiL1Address: string,
@@ -27,61 +48,114 @@ export function provideHandleBlock(
   apiUrl: string,
   queryOp: string,
   queryArb: string,
-  headers: {}
+  headers: {},
+  daiL2Address: string
 ): HandleBlock {
-  const func = async (i: number) => {
-    const resp = await axios.post(
-      apiUrl,
-      {
-        query: i === 0 ? queryOp : queryArb,
-      },
-      { headers: headers }
-    );
-    return resp["data"]["data"]["alerts"]["alerts"][0]["metadata"];
-  };
-
-  let provider = new ethers.providers.JsonRpcProvider(getJsonRpcUrl());
-  let DAI_L1 = new ethers.Contract(DaiL1Address, erc20Abi, provider);
-
-  return async (_: BlockEvent) => {
+  return async (blockEvent: BlockEvent) => {
     const findings: Finding[] = [];
-    for (let i = 0; i < 2; i++) {
-      const chainName = i === 0 ? "Optimism" : "Arbitrum";
-      let escrowBal =
-        parseFloat(
-          await DAI_L1.balanceOf(
-            i === 0 ? l1EscrowAddressOp : l1EscrowAddressArb
-          )
-        ) / Math.pow(10, 18);
-      let flag = false;
-      let L2_metadata = await func(i);
+    let provider: JsonRpcProvider = getEthersProvider();
 
-      if (parseFloat(L2_metadata["totalSupplyDai"]) > escrowBal) flag = true;
+    let currChainId = (await provider._networkPromise).chainId;
 
-      if (flag) {
-        const alertName =
-          i === 0 ? "OP: DAI L1 less than L2" : "AB: DAI L1 less than L2";
-        findings.push(
-          Finding.fromObject({
-            name: alertName,
-            description:
-              "DAI balance of L1 escrow for " +
-              chainName +
-              " DAI bridge less than DAI supply on L2",
-            alertId: "DAI_BALANCE-1",
-            severity: FindingSeverity.High,
-            type: FindingType.Exploit,
-            protocol: "MakerDAO (mainnet)",
-            metadata: {
-              escrowBal: escrowBal.toString(),
-              L2_sup: L2_metadata["totalSupplyDai"].toString(),
-              L2_chainId: L2_metadata["chainId"],
-              L2_chainName: i === 0 ? "Optimism" : "Arbitrum",
-            },
-          })
-        );
-      }
-    }
+    findings.push(
+      Finding.fromObject({
+        name: "-1",
+        description: "chain on which i am is: ",
+        alertId: "DAI_mainnet--1",
+        severity: FindingSeverity.Low,
+        type: FindingType.Info,
+        protocol: "MakerDAO",
+        metadata: {
+          blockNumber: blockEvent.blockNumber.toString()
+        },
+      })
+    );
+ 
+    // findings.push(
+    //   Finding.fromObject({
+    //     name: "0",
+    //     description: "chain on which i am is: " + currChainId.toString(),
+    //     alertId: "DAI_mainnet-0",
+    //     severity: FindingSeverity.Low,
+    //     type: FindingType.Info,
+    //     metadata: {},
+    //   })
+    // );
+ 
+
+    // if (currChainId.toString() === "1") {
+    //   findings.push(
+    //     Finding.fromObject({
+    //       name: "1",
+    //       description: "chain on which i am is: " + currChainId.toString(),
+    //       alertId: "DAI_mainnet-1",
+    //       severity: FindingSeverity.Low,
+    //       type: FindingType.Info,
+    //       metadata: {},
+    //     })
+    //   );
+   
+    // }
+    // else if (currChainId.toString() === "10") {
+    //   let DAI_L2 = new ethers.Contract(daiL2Address, erc20Abi, provider);
+    //   let L2_totalSupply = parseFloat(await DAI_L2.totalSupply());
+    //   L2_totalSupply /= Math.pow(10, 18);
+
+    //   findings.push(
+    //     Finding.fromObject({
+    //       name: "(OP)DAI balance update",
+    //       description: `Returns the total supply of L2 Optimism DAI tokens`,
+    //       alertId: "OP_DAI_SUPPLY-1",
+    //       severity: FindingSeverity.Low,
+    //       type: FindingType.Info,
+    //       protocol: "MakerDAO",
+    //       metadata: {
+    //         blockNumber: blockEvent.blockNumber.toString(),
+    //         blockHash: blockEvent.blockHash,
+    //         chainId: "10",
+    //         totalSupplyDAI: L2_totalSupply.toString(),
+    //       },
+
+    //     })
+    //   );
+    // } else if (currChainId.toString() === "42161") {
+
+    //   let DAI_L2 = new ethers.Contract(daiL2Address, erc20Abi, provider);
+    //   let L2_totalSupply = parseFloat(await DAI_L2.totalSupply());
+    //   L2_totalSupply /= Math.pow(10, 18);
+
+    //   findings.push(
+    //     Finding.fromObject({
+    //       name: "(ARB)DAI balance update",
+    //       description: `Returns the total supply of L2 Arbitrum DAI tokens`,
+    //       alertId: "ARB_DAI_SUPPLY-1",
+    //       severity: FindingSeverity.Low,
+    //       type: FindingType.Info,
+    //       protocol: "MakerDAO",
+    //       metadata: {
+    //         blockNumber: blockEvent.blockNumber.toString(),
+    //         blockHash: blockEvent.blockHash,
+    //         chainId: "42161",
+    //         totalSupplyDAI: L2_totalSupply.toString(),
+    //       },
+    //     })
+    //   );
+
+    // }
+    // else {
+    //   findings.push(
+    //     Finding.fromObject({
+    //       name: "4",
+    //       description: "chain on which i am is: " + currChainId.toString(),
+    //       alertId: "DAI_ERR",
+    //       severity: FindingSeverity.Low,
+    //       type: FindingType.Info,
+    //       metadata: {},
+    //     })
+    //   );
+
+    // }
+
     return findings;
   };
 }
@@ -95,6 +169,7 @@ export default {
     API_URL,
     QUERY_OP,
     QUERY_ARB,
-    HEADERS
+    HEADERS,
+    DAI_L2_ADDRESS
   ),
 };

@@ -1,12 +1,12 @@
 {
-  "name": "dai-bridged-balance-checker",
-  "repository": "https://github.com/MakC-Ukr/dai_bridge-forta-agent/tree/master/L1-bot",
-  "version": "0.0.14",
-  "description": "Checks if the L2 total supply of DAI is less than the amount of DAI deposited on L1 escrow for MakerDAO",
+  "name": "dai-bridge-bot",
+  "version": "0.0.9",
+  "description": "Forta bot that detects the condition if the total supply of DAI on an L2 exceeds the amount of DAI locked in the mainnet escrow",
+  "repository": "https://github.com/MakC-Ukr/dai_bridge-forta-agent",
   "chainIds": [
     1,
-    10,
-    42161
+    42161,
+    10
   ],
   "scripts": {
     "build": "tsc",
@@ -33,8 +33,6 @@
   "devDependencies": {
     "@types/jest": "^27.0.1",
     "@types/nodemon": "^1.19.0",
-    "axios": "^0.27.2",
-    "ethers": "^5.6.9",
     "jest": "^27.0.6",
     "nodemon": "^2.0.8",
     "ts-jest": "^27.0.3",

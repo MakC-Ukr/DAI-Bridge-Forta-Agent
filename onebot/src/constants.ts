@@ -5,16 +5,8 @@ const L1_ESCROW_ADDRESS_ARB: string =
   "0xA10c7CE4b876998858b1a9E12b10092229539400";
 const API_URL: string = "https://api.forta.network/graphql";
 const ERC20_ABI: any[] = [
-  {
-    constant: true,
-    inputs: [{ internalType: "address", name: "", type: "address" }],
-    name: "balanceOf",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
-  "function totalSupply() view returns (uint)"
+  "function balanceOf(address) view returns (uint)",
+  "function totalSupply() view returns (uint)",
 ];
 
 const DAI_L2_ADDRESS = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1";
@@ -24,7 +16,7 @@ const QUERY_OP: string = `query recentAlerts {
     input: {
       first: 1
       bots: [
-        "0xda07e20f41b66467c8e16dbfda9ed047570a4dd43becf760d54db866695427ca"
+        "0xc33cfbe2c914e3d3c760ed46e8a546a3e3ccaa263a9a4e357bd5b7d877b49e9e"
       ]
       chainId: 10
     }
@@ -47,7 +39,7 @@ const QUERY_ARB: string = `query recentAlerts {
     input: {
       first: 1
       bots: [
-        "0xda07e20f41b66467c8e16dbfda9ed047570a4dd43becf760d54db866695427ca"
+        "0xc33cfbe2c914e3d3c760ed46e8a546a3e3ccaa263a9a4e357bd5b7d877b49e9e"
       ]
       chainId: 42161
     }
