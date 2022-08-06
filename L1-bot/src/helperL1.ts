@@ -57,7 +57,7 @@ const findingPusher_OP = (
 ) => {
   findings.push(
     Finding.fromObject({
-      name: "DAI balance update",
+      name: "(OP)DAI balance update",
       description: `Returns the total supply of L2 Optimism DAI tokens`,
       alertId: "OP_DAI_SUPPLY-1",
       severity: FindingSeverity.Low,
@@ -73,15 +73,14 @@ const findingPusher_OP = (
   );
 };
 
-const 
-findingPusher_ARB = (
+const findingPusher_ARB = (
   findings: Finding[],
   blockEvent: BlockEvent,
   L2_totalSupply: number
 ) => {
   findings.push(
     Finding.fromObject({
-      name: "DAI balance update",
+      name: "(ARB)DAI balance update",
       description: `Returns the total supply of L2 Arbitrum DAI tokens`,
       alertId: "ARB_DAI_SUPPLY-1",
       severity: FindingSeverity.Low,

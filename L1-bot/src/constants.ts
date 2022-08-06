@@ -14,15 +14,7 @@ const ERC20_ABI: any[] = [
     stateMutability: "view",
     type: "function",
   },
-  {
-    constant: true,
-    inputs: [],
-    name: "totalSupply",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    payable: false,
-    stateMutability: "view",
-    type: "function",
-  },
+  "function totalSupply() view returns (uint)"
 ];
 
 const DAI_L2_ADDRESS = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1";

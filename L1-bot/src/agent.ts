@@ -5,6 +5,7 @@ import {
   FindingSeverity,
   getJsonRpcUrl,
   FindingType,
+  getEthersProvider
 } from "forta-agent";
 var ethers = require("ethers");
 import {
@@ -20,12 +21,24 @@ import {
 } from "./constants";
 import axios from "axios";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import {
-  apiCallL1,
-  findingPusherL1,
-  findingPusher_OP,
-  findingPusher_ARB,
-} from "./helperL1";
+
+async function func(
+  i: number,
+  apiUrl: string,
+  queryArb: string,
+  queryOp: string,
+  headers: {}
+) {
+  const resp = await axios.post(
+    apiUrl,
+    {
+      query: i === 0 ? queryOp : queryArb,
+    },
+    { headers: headers }
+  );
+  return resp["data"]["data"]["alerts"]["alerts"][0]["metadata"];
+};
+
 
 export function provideHandleBlock(
   DaiL1Address: string,
@@ -40,68 +53,114 @@ export function provideHandleBlock(
 ): HandleBlock {
   return async (blockEvent: BlockEvent) => {
     const findings: Finding[] = [];
-    let provider: JsonRpcProvider = new ethers.providers.JsonRpcProvider(
-      getJsonRpcUrl()
-    );
+    let provider: JsonRpcProvider = getEthersProvider();
+
     let currChainId = (await provider._networkPromise).chainId;
 
-    if (currChainId == 1) {
-      try{
-        let DAI_L1 = new ethers.Contract(DaiL1Address, erc20Abi, provider);
-        for (let i = 0; i < 2; i++) {
-          const chainName = i === 0 ? "Optimism" : "Arbitrum";
-          let escrowBal =
-            parseFloat(
-              await DAI_L1.balanceOf(
-                i === 0 ? l1EscrowAddressOp : l1EscrowAddressArb
-              )
-            ) / Math.pow(10, 18);
-          let flag = false;
-          let L2_metadata = await apiCallL1(
-            i,
-            apiUrl,
-            queryArb,
-            queryOp,
-            headers
-          );
-          if (parseFloat(L2_metadata["totalSupplyDai"]) > escrowBal) flag = true;
-          if (flag) {
-            findingPusherL1(
-              i,
-              findings,
-              chainName,
-              escrowBal,
-              L2_metadata["totalSupplyDai"].toString(),
-              L2_metadata["chainId"]
-            );
-          }
-        }
-      }
-      catch(err:any)
-      {
-        findings.push(
-          Finding.fromObject({
-            name: err.toString(),
-            description:
-              "some error called",
-            alertId: "DAI_ERR",
-            severity: FindingSeverity.Low,
-            type: FindingType.Info,
-            metadata: {}
-          }
-          )
-        );
-      }
-    } else if (currChainId == 10) {
+
+    if (currChainId.toString() === "1") {
+        // let DAI_L1 = new ethers.Contract(DaiL1Address, erc20Abi, provider);
+        // for (let i = 0; i < 1; i++) {
+          // const chainName = i === 0 ? "Optimism" : "Arbitrum";
+          // let l1Bal = await DAI_L1.balanceOf(i === 0 ? l1EscrowAddressOp : l1EscrowAddressArb)
+          // let l1Bal = await DAI_L1.balanceOf(l1EscrowAddressOp);
+          // let escrowBal = parseFloat(l1Bal) / Math.pow(10, 18);
+          // let flag = false;
+
+          // let L2_metadata = await func(
+          //   i,
+          //   apiUrl,
+          //   queryArb,
+          //   queryOp,
+          //   headers
+          // );
+          
+          // let l2Supply : string = L2_metadata['totalSupplyDai'];
+          // console.log(l2Supply);
+
+          // if (parseFloat(L2_metadata["totalSupplyDai"]) <= escrowBal){ 
+          //   flag = true;
+          // }
+
+          // if (flag) {
+            findings.push(
+              Finding.fromObject({
+                name: "(OP)DAI balance update",
+                description: `Returns the total supply of L2 Optimism DAI tokens`,
+                alertId: "OP_DAI_SUPPLY-1",
+                severity: FindingSeverity.Low,
+                type: FindingType.Info,
+                protocol: "MakerDAO",
+                // metadata: {
+                //   blockNumber: blockEvent.blockNumber.toString(),
+                //   blockHash: blockEvent.blockHash,
+                //   chainId: "10",
+                //   escrowBal: escrowBal.toString(),
+                //   l1Balance: l1Bal,
+                // }
+              })
+            );      
+
+          // }
+        // }
+    }
+    else if (currChainId.toString() === "10") {
       let DAI_L2 = new ethers.Contract(daiL2Address, erc20Abi, provider);
       let L2_totalSupply = parseFloat(await DAI_L2.totalSupply());
       L2_totalSupply /= Math.pow(10, 18);
-      findingPusher_OP(findings, blockEvent, L2_totalSupply);
-    } else if (currChainId == 42161) {
+
+      findings.push(
+        Finding.fromObject({
+          name: "(OP)DAI balance update",
+          description: `Returns the total supply of L2 Optimism DAI tokens`,
+          alertId: "OP_DAI_SUPPLY-1",
+          severity: FindingSeverity.Low,
+          type: FindingType.Info,
+          protocol: "MakerDAO",
+          metadata: {
+            blockNumber: blockEvent.blockNumber.toString(),
+            blockHash: blockEvent.blockHash,
+            chainId: "10",
+            totalSupplyDAI: L2_totalSupply.toString(),
+          },
+
+        })
+      );
+    } else if (currChainId.toString() === "42161") {
       let DAI_L2 = new ethers.Contract(daiL2Address, erc20Abi, provider);
       let L2_totalSupply = parseFloat(await DAI_L2.totalSupply());
       L2_totalSupply /= Math.pow(10, 18);
-      findingPusher_ARB(findings, blockEvent, L2_totalSupply);
+
+      findings.push(
+        Finding.fromObject({
+          name: "(ARB)DAI balance update",
+          description: `Returns the total supply of L2 Arbitrum DAI tokens`,
+          alertId: "ARB_DAI_SUPPLY-1",
+          severity: FindingSeverity.Low,
+          type: FindingType.Info,
+          protocol: "MakerDAO",
+          metadata: {
+            blockNumber: blockEvent.blockNumber.toString(),
+            blockHash: blockEvent.blockHash,
+            chainId: "42161",
+            totalSupplyDAI: L2_totalSupply.toString(),
+          },
+        })
+      );
+
+    }
+    else {
+      findings.push(
+        Finding.fromObject({
+          name: "4",
+          description: "chain on which i am is: " + currChainId.toString(),
+          alertId: "DAI_ERR",
+          severity: FindingSeverity.Low,
+          type: FindingType.Info,
+          metadata: {},
+        })
+      );
+
     }
 
     return findings;

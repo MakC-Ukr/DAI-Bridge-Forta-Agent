@@ -1,11 +1,11 @@
 {
   "name": "dai-bridged-balance-checker",
   "repository": "https://github.com/MakC-Ukr/dai_bridge-forta-agent/tree/master/L1-bot",
-  "version": "0.0.2",
+  "version": "0.0.13",
   "description": "Checks if the L2 total supply of DAI is less than the amount of DAI deposited on L1 escrow for MakerDAO",
   "chainIds": [
-    1, 
-    10, 
+    1,
+    10,
     42161
   ],
   "scripts": {
