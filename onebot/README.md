@@ -2,7 +2,7 @@
 
 ## Description
 
-This bot detects checks if the L2 total supply of DAI is less than the amount of DAI deposited on L1 escrow for MakerDAO
+This bot checks if the L2 total supply of DAI is less than the amount of DAI deposited on L1 escrow for MakerDAO
 
 ## Supported Chains
 

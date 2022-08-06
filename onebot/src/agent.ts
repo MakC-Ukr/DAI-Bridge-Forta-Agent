@@ -3,11 +3,10 @@ import {
   Finding,
   HandleBlock,
   FindingSeverity,
-  getJsonRpcUrl,
   FindingType,
   getEthersProvider,
+  ethers
 } from "forta-agent";
-var ethers = require("ethers");
 import {
   DAI_L1_ADDRESS,
   ERC20_ABI,
@@ -50,7 +49,7 @@ export function provideHandleBlock(
 
     const findings: Finding[] = [];
 
-    if (currChainId.toString() == "1") {
+    if (currChainId.toString() === "1") {
       let DAI_L1 = new ethers.Contract(daiL1Address, erc20Abi, provider);
       // let L1_totalSupply = parseFloat(await DAI_L1.totalSupply());
       // Optimism
@@ -118,7 +117,7 @@ export function provideHandleBlock(
 
       findings.push(
         Finding.fromObject({
-          name: "(OP)DAI balance update",
+          name: "(OP)DAI-balance-update",
           description: `Returns the total supply of L2 Optimism DAI tokens`,
           alertId: "OP_DAI_SUPPLY-1",
           severity: FindingSeverity.Low,
@@ -139,7 +138,7 @@ export function provideHandleBlock(
 
       findings.push(
         Finding.fromObject({
-          name: "(ARB)DAI balance update",
+          name: "(ARB)DAI-balance-update",
           description: `Returns the total supply of L2 Arbitrum DAI tokens`,
           alertId: "ARB_DAI_SUPPLY-1",
           severity: FindingSeverity.Low,
