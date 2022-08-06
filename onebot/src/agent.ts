@@ -53,15 +53,15 @@ export function provideHandleBlock(
       let DAI_L1 = new ethers.Contract(daiL1Address, erc20Abi, provider);
       // let L1_totalSupply = parseFloat(await DAI_L1.totalSupply());
       // Optimism
-      let L1_totalSupply_OP = parseFloat(
+      let L1_escrowBal_OP = parseFloat(
         await DAI_L1.balanceOf(l1EscrowAddressOp)
       );
-      L1_totalSupply_OP = L1_totalSupply_OP / 1000000000000000000;
+      L1_escrowBal_OP = L1_escrowBal_OP / 1000000000000000000;
       let l2_metadata_OP = (await func(apiUrl, queryOp, headers))[
         "totalSupplyDai"
       ];
 
-      if (L1_totalSupply_OP >= l2_metadata_OP) {
+      if (L1_escrowBal_OP < l2_metadata_OP) {
         findings.push(
           Finding.fromObject({
             name: "dai-bridge-bot",
@@ -74,7 +74,7 @@ export function provideHandleBlock(
             type: FindingType.Exploit,
             protocol: "MakerDAO (mainnet)",
             metadata: {
-              escrowBal: L1_totalSupply_OP.toString(),
+              escrowBal: L1_escrowBal_OP.toString(),
               L2_chainName: "Optimism",
               l2_totalSupply: l2_metadata_OP,
             },
@@ -82,15 +82,15 @@ export function provideHandleBlock(
         );
       }
       // ARBITRUM
-      let L1_totalSupply_ARB = parseFloat(
+      let L1_escrowBal_ARB = parseFloat(
         await DAI_L1.balanceOf(l1EscrowAddressArb)
       );
-      L1_totalSupply_ARB = L1_totalSupply_ARB / 1000000000000000000;
+      L1_escrowBal_ARB = L1_escrowBal_ARB / 1000000000000000000;
       let l2_metadata_ARB = (await func(apiUrl, queryArb, headers))[
         "totalSupplyDai"
       ];
 
-      if (L1_totalSupply_ARB >= l2_metadata_ARB) {
+      if (L1_escrowBal_ARB < l2_metadata_ARB) {
         findings.push(
           Finding.fromObject({
             name: "dai-bridge-bot",
@@ -103,7 +103,7 @@ export function provideHandleBlock(
             type: FindingType.Exploit,
             protocol: "MakerDAO (mainnet)",
             metadata: {
-              escrowBal: L1_totalSupply_ARB.toString(),
+              escrowBal: L1_escrowBal_ARB.toString(),
               L2_chainName: "Arbitrum",
               l2_totalSupply: l2_metadata_ARB,
             },
