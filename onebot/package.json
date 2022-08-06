@@ -1,6 +1,6 @@
 {
   "name": "dai-bridge-bot",
-  "version": "0.0.9",
+  "version": "0.0.2",
   "description": "Forta bot that detects the condition if the total supply of DAI on an L2 exceeds the amount of DAI locked in the mainnet escrow",
   "repository": "https://github.com/MakC-Ukr/dai_bridge-forta-agent",
   "chainIds": [
