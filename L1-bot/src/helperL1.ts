@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Finding, FindingSeverity, FindingType } from "forta-agent";
+import { BlockEvent, Finding, FindingSeverity, FindingType } from "forta-agent";
 
 const apiCallL1 = async (
   i: number,
@@ -48,4 +48,53 @@ const findingPusherL1 = async (
     })
   );
 };
-export { apiCallL1, findingPusherL1 };
+
+// TODO needs to be deleted
+const findingPusher_OP = (
+  findings: Finding[],
+  blockEvent: BlockEvent,
+  L2_totalSupply: number
+) => {
+  findings.push(
+    Finding.fromObject({
+      name: "DAI balance update",
+      description: `Returns the total supply of L2 Optimism DAI tokens`,
+      alertId: "OP_DAI_SUPPLY-1",
+      severity: FindingSeverity.Low,
+      type: FindingType.Info,
+      protocol: "MakerDAO",
+      metadata: {
+        blockNumber: blockEvent.blockNumber.toString(),
+        blockHash: blockEvent.blockHash,
+        chainId: "10",
+        totalSupplyDAI: L2_totalSupply.toString(),
+      },
+    })
+  );
+};
+
+const 
+findingPusher_ARB = (
+  findings: Finding[],
+  blockEvent: BlockEvent,
+  L2_totalSupply: number
+) => {
+  findings.push(
+    Finding.fromObject({
+      name: "DAI balance update",
+      description: `Returns the total supply of L2 Arbitrum DAI tokens`,
+      alertId: "ARB_DAI_SUPPLY-1",
+      severity: FindingSeverity.Low,
+      type: FindingType.Info,
+      protocol: "MakerDAO",
+      metadata: {
+        blockNumber: blockEvent.blockNumber.toString(),
+        blockHash: blockEvent.blockHash,
+        chainId: "42161",
+        totalSupplyDAI: L2_totalSupply.toString(),
+      },
+    })
+  );
+};
+
+export { apiCallL1, findingPusherL1, findingPusher_OP, findingPusher_ARB };

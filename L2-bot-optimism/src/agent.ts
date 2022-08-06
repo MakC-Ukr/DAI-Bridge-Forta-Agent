@@ -1,11 +1,4 @@
-import {
-  BlockEvent,
-  Finding,
-  HandleBlock,
-  FindingSeverity,
-  getJsonRpcUrl,
-  FindingType,
-} from "forta-agent";
+import { BlockEvent, Finding, HandleBlock, FindingSeverity, getJsonRpcUrl, FindingType } from "forta-agent";
 var ethers = require("ethers");
 import { DAI_L2_ADDRESS, ERC20_ABI, CHAIN_ID_BOT } from "./constants";
 

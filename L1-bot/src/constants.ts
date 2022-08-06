@@ -25,13 +25,14 @@ const ERC20_ABI: any[] = [
   },
 ];
 
+const DAI_L2_ADDRESS = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1";
+
 const QUERY_OP: string = `query recentAlerts {
   alerts(
     input: {
       first: 1
-      createdSince: 600000
       bots: [
-        "0x4ee97e15449fe5c14fd556f2b8a51a41f826f9c8df189d4328e92fa955a703dd"
+        "0xda07e20f41b66467c8e16dbfda9ed047570a4dd43becf760d54db866695427ca"
       ]
       chainId: 10
     }
@@ -53,9 +54,8 @@ const QUERY_ARB: string = `query recentAlerts {
   alerts(
     input: {
       first: 1
-      createdSince: 600000
       bots: [
-        "0xe83234e6d5182610b4165bccb1b0dcf29c4582a18cf0c097bfc1d056edbe07b3"
+        "0xda07e20f41b66467c8e16dbfda9ed047570a4dd43becf760d54db866695427ca"
       ]
       chainId: 42161
     }
@@ -86,4 +86,5 @@ export {
   QUERY_ARB,
   HEADERS,
   API_URL,
+  DAI_L2_ADDRESS,
 };
