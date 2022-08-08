@@ -5,7 +5,7 @@ import {
   FindingSeverity,
   FindingType,
   getEthersProvider,
-  ethers
+  ethers,
 } from "forta-agent";
 import {
   DAI_L1_ADDRESS,
@@ -13,13 +13,13 @@ import {
   L1_ESCROW_ADDRESS_ARB,
   L1_ESCROW_ADDRESS_OP,
   API_URL,
-  QUERY_OP,
-  QUERY_ARB,
+  QUERY_API,
   HEADERS,
   DAI_L2_ADDRESS,
 } from "./constants";
 import axios from "axios";
 import { JsonRpcProvider } from "@ethersproject/providers";
+// import fortaConfig from '../forta.config.json';
 
 async function func(apiUrl: string, querySent: string, headers: {}) {
   const resp = await axios.post(
@@ -32,14 +32,16 @@ async function func(apiUrl: string, querySent: string, headers: {}) {
   return resp["data"]["data"]["alerts"]["alerts"][0]["metadata"];
 }
 
+let chainSpecificCache: number = 0;
+const currBotId =
+  "0x8373bf9a8693bd5aa0454625e55a94c9493c2fddae9cdb46b3ba93061e2f6e7d";
+
 export function provideHandleBlock(
   daiL1Address: string,
   erc20Abi: any[],
   l1EscrowAddressArb: string,
   l1EscrowAddressOp: string,
   apiUrl: string,
-  queryOp: string,
-  queryArb: string,
   headers: {},
   daiL2Address: string
 ): HandleBlock {
@@ -51,17 +53,19 @@ export function provideHandleBlock(
 
     if (currChainId.toString() === "1") {
       let DAI_L1 = new ethers.Contract(daiL1Address, erc20Abi, provider);
-      // let L1_totalSupply = parseFloat(await DAI_L1.totalSupply());
       // Optimism
       let L1_escrowBal_OP = parseFloat(
         await DAI_L1.balanceOf(l1EscrowAddressOp)
       );
-      L1_escrowBal_OP = L1_escrowBal_OP / 1000000000000000000;
-      let l2_metadata_OP = (await func(apiUrl, queryOp, headers))[
-        "totalSupplyDai"
-      ];
+      let l2_metadata_OP = (
+        await func(apiUrl, QUERY_API(currBotId, "10"), headers)
+      )["totalSupplyDai"];
 
-      if (L1_escrowBal_OP < l2_metadata_OP) {
+      // if(l2_metadata_OP == 0){
+      //   return findings;
+      // }
+
+      if (L1_escrowBal_OP >= l2_metadata_OP) {
         findings.push(
           Finding.fromObject({
             name: "dai-bridge-bot",
@@ -76,7 +80,7 @@ export function provideHandleBlock(
             metadata: {
               escrowBal: L1_escrowBal_OP.toString(),
               L2_chainName: "Optimism",
-              l2_totalSupply: l2_metadata_OP,
+              l2_totalSupply: l2_metadata_OP.toString(),
             },
           })
         );
@@ -85,12 +89,11 @@ export function provideHandleBlock(
       let L1_escrowBal_ARB = parseFloat(
         await DAI_L1.balanceOf(l1EscrowAddressArb)
       );
-      L1_escrowBal_ARB = L1_escrowBal_ARB / 1000000000000000000;
-      let l2_metadata_ARB = (await func(apiUrl, queryArb, headers))[
-        "totalSupplyDai"
-      ];
+      let l2_metadata_ARB = (
+        await func(apiUrl, QUERY_API(currBotId, "42161"), headers)
+      )["totalSupplyDai"];
 
-      if (L1_escrowBal_ARB < l2_metadata_ARB) {
+      if (L1_escrowBal_ARB >= l2_metadata_ARB) {
         findings.push(
           Finding.fromObject({
             name: "dai-bridge-bot",
@@ -105,7 +108,7 @@ export function provideHandleBlock(
             metadata: {
               escrowBal: L1_escrowBal_ARB.toString(),
               L2_chainName: "Arbitrum",
-              l2_totalSupply: l2_metadata_ARB,
+              l2_totalSupply: l2_metadata_ARB.toString(),
             },
           })
         );
@@ -113,45 +116,53 @@ export function provideHandleBlock(
     } else if (currChainId.toString() === "10") {
       let DAI_L2 = new ethers.Contract(daiL2Address, erc20Abi, provider);
       let L2_totalSupply = parseFloat(await DAI_L2.totalSupply());
-      L2_totalSupply /= Math.pow(10, 18);
 
-      findings.push(
-        Finding.fromObject({
-          name: "(OP)DAI-balance-update",
-          description: `Returns the total supply of L2 Optimism DAI tokens`,
-          alertId: "OP_DAI_SUPPLY-1",
-          severity: FindingSeverity.Low,
-          type: FindingType.Info,
-          protocol: "MakerDAO",
-          metadata: {
-            blockNumber: blockEvent.blockNumber.toString(),
-            blockHash: blockEvent.blockHash,
-            chainId: "10",
-            totalSupplyDAI: L2_totalSupply.toString(),
-          },
-        })
-      );
+      if (chainSpecificCache != L2_totalSupply) {
+        findings.push(
+          Finding.fromObject({
+            name: "(OP)DAI-balance-update",
+            description: `Returns the total supply of L2 Optimism DAI tokens`,
+            alertId: "OP_DAI_SUPPLY-1",
+            severity: FindingSeverity.Low,
+            type: FindingType.Info,
+            protocol: "MakerDAO",
+            metadata: {
+              blockNumber: blockEvent.blockNumber.toString(),
+              blockHash: blockEvent.blockHash,
+              chainId: "10",
+              totalSupplyDAI: L2_totalSupply.toString(),
+              prevTotalSupply: chainSpecificCache.toString(),
+            },
+          })
+        );
+      }
+
+      chainSpecificCache = L2_totalSupply;
     } else if (currChainId.toString() === "42161") {
       let DAI_L2 = new ethers.Contract(daiL2Address, ERC20_ABI, provider);
       let L2_totalSupply = parseFloat(await DAI_L2.totalSupply());
-      L2_totalSupply /= Math.pow(10, 18);
 
-      findings.push(
-        Finding.fromObject({
-          name: "(ARB)DAI-balance-update",
-          description: `Returns the total supply of L2 Arbitrum DAI tokens`,
-          alertId: "ARB_DAI_SUPPLY-1",
-          severity: FindingSeverity.Low,
-          type: FindingType.Info,
-          protocol: "MakerDAO",
-          metadata: {
-            blockNumber: blockEvent.blockNumber.toString(),
-            blockHash: blockEvent.blockHash,
-            chainId: "42161",
-            totalSupplyDAI: L2_totalSupply.toString(),
-          },
-        })
-      );
+      if (chainSpecificCache != L2_totalSupply) {
+        findings.push(
+          Finding.fromObject({
+            name: "(ARB)DAI-balance-update",
+            description: `Returns the total supply of L2 Arbitrum DAI tokens`,
+            alertId: "ARB_DAI_SUPPLY-1",
+            severity: FindingSeverity.Low,
+            type: FindingType.Info,
+            protocol: "MakerDAO",
+            metadata: {
+              blockNumber: blockEvent.blockNumber.toString(),
+              blockHash: blockEvent.blockHash,
+              chainId: "42161",
+              totalSupplyDAI: L2_totalSupply.toString(),
+              prevTotalSupply: chainSpecificCache.toString(),
+            },
+          })
+        );
+
+        chainSpecificCache = L2_totalSupply;
+      }
     }
 
     return findings;
@@ -165,8 +176,6 @@ export default {
     L1_ESCROW_ADDRESS_ARB,
     L1_ESCROW_ADDRESS_OP,
     API_URL,
-    QUERY_OP,
-    QUERY_ARB,
     HEADERS,
     DAI_L2_ADDRESS
   ),
