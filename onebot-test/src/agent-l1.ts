@@ -30,7 +30,7 @@ async function func(apiUrl: string, querySent: string, headers: {}) {
   );
 
   const alerts: [] = resp["data"]["data"]["alerts"]["alerts"];
-  if (alerts.length == 0) {
+  if (alerts.length === 0) {
     return { totalSupplyDai: -1 };
   }
   return resp["data"]["data"]["alerts"]["alerts"][0]["metadata"];
