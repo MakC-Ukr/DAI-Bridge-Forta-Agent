@@ -41,7 +41,6 @@ export async function provideHandleBlock_L1(
   apiUrl: string,
   headers: {}
 ): Promise<Finding[]> {
-  console.log("ISIDHU");
   let provider: JsonRpcProvider = getEthersProvider();
 
   const findings: Finding[] = [];

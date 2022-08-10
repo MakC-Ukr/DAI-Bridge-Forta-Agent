@@ -21,7 +21,6 @@ export async function provideHandleBlock_ARB(
 
   let DAI_L2 = new ethers.Contract(daiL2Address, erc20Abi, provider);
   let L2_totalSupply = parseFloat(await DAI_L2.totalSupply());
-  console.log("MOOSEWALA3");
   if (chainSpecificCache != L2_totalSupply) {
     findings.push(
       Finding.fromObject({
