@@ -1,7 +1,7 @@
 {
-  "name": "forta-agent-starter",
-  "version": "0.0.2",
-  "description": "Forta Agent Typescript starter project",
+  "name": "dai-bridge-bot",
+  "version": "0.0.3",
+  "description": "Forta bot that detects the condition if the total supply of DAI on an L2 exceeds the amount of DAI locked in the mainnet escrow",
   "chainIds": [
     1, 
     10, 
