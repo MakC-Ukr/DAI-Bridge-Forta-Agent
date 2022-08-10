@@ -1,39 +1,56 @@
-import { TransactionEvent, ethers, Finding, getEthersProvider, HandleTransaction, Initialize } from "forta-agent";
-import CONFIG from "./agent.config";
-import { FLASH_LOAN_FEE_PERCENTAGE_CHANGED_ABI, SWAP_FEE_PERCENTAGE_CHANGED_ABI } from "./constants";
-import { NetworkManager } from "forta-agent-tools";
-import { NetworkData } from "./utils";
-import { createFinding } from "./finding";
+// import { Finding, getEthersProvider, Initialize, HandleTransaction, TransactionEvent } from "forta-agent";
+// import { BigNumber } from "bignumber.js";
+// import { providers, Contract } from "ethers";
+// import { NetworkManager } from "forta-agent-tools";
+// import { NetworkData, SmartCaller, toBn } from "./utils";
+// import { EVENT, TOKEN_ABI } from "./constants";
+// import CONFIG from "./agent.config";
+// import { createFinding } from "./findings";
 
-const networkManager = new NetworkManager<NetworkData>(CONFIG);
+// BigNumber.set({ DECIMAL_PLACES: 18 });
 
-export const provideInitialize = (
-  networkManager: NetworkManager<NetworkData>,
-  provider: ethers.providers.Provider
-): Initialize => {
-  return async () => {
-    await networkManager.init(provider);
-  };
-};
+// const networkManager = new NetworkManager<NetworkData>(CONFIG);
 
-export const provideHandleTransaction = (networkManager: NetworkManager<NetworkData>): HandleTransaction => {
-  return async (txEvent: TransactionEvent): Promise<Finding[]> => {
-    const logs = txEvent.filterLog(
-      [SWAP_FEE_PERCENTAGE_CHANGED_ABI, FLASH_LOAN_FEE_PERCENTAGE_CHANGED_ABI],
-      networkManager.get("protocolFeesCollectorAddress")
-    );
+// const provideInitialize = (networkManager: NetworkManager<NetworkData>, provider: providers.Provider): Initialize => {
+//   return async () => {
+//     await networkManager.init(provider);
+//   };
+// };
 
-    if (!logs.length) return [];
+// export const provideHandleTransaction =
+//   (networkManager: NetworkManager<NetworkData>, provider: providers.Provider): HandleTransaction =>
+//   async (txEvent: TransactionEvent): Promise<Finding[]> => {
+//     const findings: Finding[] = [];
 
-    return logs.map((log) => {
-      const feeFrom = log.name.replace("FeePercentageChanged", "");
+//     const logs = txEvent.filterLog(EVENT, networkManager.get("balToken"));
+//     const balToken = SmartCaller.from(new Contract(networkManager.get("balToken"), TOKEN_ABI, provider));
 
-      return createFinding(feeFrom as "FlashLoan" | "Swap", log.args[0]);
-    });
-  };
-};
+//     await Promise.all(
+//       logs.map(async (log) => {
+//         const { to, from, value } = log.args;
 
-export default {
-  initialize: provideInitialize(networkManager, getEthersProvider()),
-  handleTransaction: provideHandleTransaction(networkManager),
-};
+//         const bnValue = toBn(value);
+
+//         const totalSupply = toBn(
+//           await balToken.totalSupply({
+//             blockTag: txEvent.blockNumber,
+//           })
+//         );
+
+//         const _threshold = totalSupply.multipliedBy(networkManager.get("threshold")).dividedBy(100);
+
+//         if (bnValue.gte(_threshold)) {
+//           const percentage = bnValue.multipliedBy(100).dividedBy(totalSupply);
+
+//           findings.push(createFinding(from, to, bnValue, percentage));
+//         }
+//       })
+//     );
+
+//     return findings;
+//   };
+
+// export default {
+//   initialize: provideInitialize(networkManager, getEthersProvider()),
+//   handleTransaction: provideHandleTransaction(networkManager, getEthersProvider()),
+// };

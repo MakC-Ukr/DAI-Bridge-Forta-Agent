@@ -5,6 +5,8 @@ import {
   getEthersProvider,
   ethers,
   Initialize,
+  FindingType,
+  FindingSeverity,
 } from "forta-agent";
 import {
   DAI_L1_ADDRESS,
@@ -23,21 +25,20 @@ import provideHandleBlock_L1 from "./agent-l1";
 import { NetworkManager } from "forta-agent-tools";
 
 interface NetworkData {
-  findingsArrayFunc: HandleBlock;
+  findingsArrayFunc: Promise<Finding[]>;
 }
 
 const data: Record<number, NetworkData> = {
   1: {
-    findingsArrayFunc: provideHandleBlock_L1.handleBlock
+    findingsArrayFunc: provideHandleBlock_L1.handleBlock,
   },
   10: {
-    findingsArrayFunc: provideHandleBlock_OP.handleBlock
+    findingsArrayFunc: provideHandleBlock_OP.handleBlock,
   },
-  42161:{
-    findingsArrayFunc: provideHandleBlock_ARB.handleBlock
-  }
+  42161: {
+    findingsArrayFunc: provideHandleBlock_ARB.handleBlock,
+  },
 };
-
 
 const networkManagerCurr = new NetworkManager(data);
 export const provideInitialize = (
@@ -50,10 +51,13 @@ export const provideInitialize = (
 };
 
 export function provideHandleBlock(): HandleBlock {
-  return networkManagerCurr.get("findingsArrayFunc");
+  return async (_: BlockEvent) => {
+    await networkManagerCurr.init(getEthersProvider());
+    return networkManagerCurr.get("findingsArrayFunc");
+  };
 }
 
 export default {
-  initialize : provideInitialize(networkManagerCurr, getEthersProvider()),
+  // initialize: provideInitialize(networkManagerCurr, getEthersProvider()),
   handleBlock: provideHandleBlock(),
 };
