@@ -12,7 +12,7 @@ import { DAI_L2_ADDRESS, ERC20_ABI } from "./constants";
 
 let chainSpecificCache: number = 0;
 
-export async function provideHandleBlock_ARB(
+async function getFindingsL2_ARB(
   erc20Abi: any[],
   daiL2Address: string
 ): Promise<Finding[]> {
@@ -21,7 +21,7 @@ export async function provideHandleBlock_ARB(
 
   let DAI_L2 = new ethers.Contract(daiL2Address, erc20Abi, provider);
   let L2_totalSupply = parseFloat(await DAI_L2.totalSupply());
-  console.log("MOOSEWALA3");
+  console.log("ARB AGENT CALLED");
   if (chainSpecificCache != L2_totalSupply) {
     findings.push(
       Finding.fromObject({
@@ -44,6 +44,4 @@ export async function provideHandleBlock_ARB(
   return findings;
 }
 
-export default {
-  handleBlock: provideHandleBlock_ARB(ERC20_ABI, DAI_L2_ADDRESS),
-};
+export default getFindingsL2_ARB(ERC20_ABI, DAI_L2_ADDRESS);

@@ -33,7 +33,7 @@ async function func(apiUrl: string, querySent: string, headers: {}) {
 const CURR_BOT_ID =
   "0x8373bf9a8693bd5aa0454625e55a94c9493c2fddae9cdb46b3ba93061e2f6e7d";
 
-export async function provideHandleBlock_L1(
+async function getFindingsL1(
   daiL1Address: string,
   erc20Abi: any[],
   l1EscrowAddressArb: string,
@@ -41,8 +41,8 @@ export async function provideHandleBlock_L1(
   apiUrl: string,
   headers: {}
 ): Promise<Finding[]> {
-  console.log("ISIDHU");
   let provider: JsonRpcProvider = getEthersProvider();
+  console.log("L1 AGENT CALLED");
 
   const findings: Finding[] = [];
   let DAI_L1 = new ethers.Contract(daiL1Address, erc20Abi, provider);
@@ -51,6 +51,7 @@ export async function provideHandleBlock_L1(
   let l2_metadata_OP = (
     await func(apiUrl, QUERY_API(CURR_BOT_ID, "10"), headers)
   )["totalSupplyDai"];
+  console.log("L1 AGENT CALLED");
 
   if (L1_escrowBal_OP >= l2_metadata_OP) {
     findings.push(
@@ -72,6 +73,8 @@ export async function provideHandleBlock_L1(
       })
     );
   }
+  console.log("L1 AGENT CALLED");
+
   // ARBITRUM
   let L1_escrowBal_ARB = parseFloat(await DAI_L1.balanceOf(l1EscrowAddressArb));
   let l2_metadata_ARB = (
@@ -103,13 +106,11 @@ export async function provideHandleBlock_L1(
 }
 
 // export default provideHandleBlock_L1;
-export default {
-  handleBlock: provideHandleBlock_L1(
+export default getFindingsL1(
     DAI_L1_ADDRESS,
     ERC20_ABI,
     L1_ESCROW_ADDRESS_ARB,
     L1_ESCROW_ADDRESS_OP,
     API_URL,
     HEADERS
-  ),
-};
+  );

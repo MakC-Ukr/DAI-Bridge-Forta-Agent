@@ -20,44 +20,31 @@ import {
 import axios from "axios";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import provideHandleBlock_ARB from "./agent-l2-arb";
-import provideHandleBlock_OP from "./agent-l2-op";
 import provideHandleBlock_L1 from "./agent-l1";
-import { NetworkManager } from "forta-agent-tools";
 
-interface NetworkData {
-  findingsArrayFunc: Promise<Finding[]>;
-}
-
-const data: Record<number, NetworkData> = {
-  1: {
-    findingsArrayFunc: provideHandleBlock_L1.handleBlock,
-  },
-  10: {
-    findingsArrayFunc: provideHandleBlock_OP.handleBlock,
-  },
-  42161: {
-    findingsArrayFunc: provideHandleBlock_ARB.handleBlock,
-  },
-};
-
-const networkManagerCurr = new NetworkManager(data);
-export const provideInitialize = (
-  networkManager: NetworkManager<NetworkData>,
-  provider: ethers.providers.Provider
-): Initialize => {
-  return async () => {
-    await networkManager.init(provider);
-  };
-};
 
 export function provideHandleBlock(): HandleBlock {
+  
   return async (_: BlockEvent) => {
-    await networkManagerCurr.init(getEthersProvider());
-    return networkManagerCurr.get("findingsArrayFunc");
+    let provider: JsonRpcProvider = getEthersProvider();
+    let currChainId = (await provider._networkPromise).chainId;
+
+    let findings: Finding[] = [];
+
+    if (currChainId.toString() === "1") {
+      findings = await provideHandleBlock_L1;
+    }
+    // else if (currChainId.toString() === "10") {
+    //   findings = await provideHandleBlock_OP;
+    // }
+    else if (currChainId.toString() === "42161") {
+      findings = await provideHandleBlock_ARB;
+    }
+
+    return findings;
   };
 }
 
 export default {
-  // initialize: provideInitialize(networkManagerCurr, getEthersProvider()),
   handleBlock: provideHandleBlock(),
 };

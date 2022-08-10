@@ -12,13 +12,13 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 
 let chainSpecificCache: number = 0;
 
-export async function provideHandleBlock_OP(
+async function getFindingsL2_OP(
   erc20Abi: any[],
   daiL2Address: string
 ): Promise<Finding[]> {
   let provider: JsonRpcProvider = getEthersProvider();
   const findings: Finding[] = [];
-  console.log("MOOSEWALA2");
+  console.log("OP AGENT CALLED");
   let DAI_L2 = new ethers.Contract(daiL2Address, erc20Abi, provider);
   let L2_totalSupply = parseFloat(await DAI_L2.totalSupply());
 
@@ -45,6 +45,4 @@ export async function provideHandleBlock_OP(
   return findings;
 }
 
-export default {
-  handleBlock: provideHandleBlock_OP(ERC20_ABI, DAI_L2_ADDRESS),
-};
+export default getFindingsL2_OP(ERC20_ABI, DAI_L2_ADDRESS);
