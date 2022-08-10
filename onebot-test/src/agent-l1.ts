@@ -15,6 +15,7 @@ import {
   L1_ESCROW_ADDRESS_OP,
   API_URL,
   HEADERS,
+  CURR_BOT_ID
 } from "./constants";
 import axios from "axios";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -34,9 +35,6 @@ async function func(apiUrl: string, querySent: string, headers: {}) {
   }
   return resp["data"]["data"]["alerts"]["alerts"][0]["metadata"];
 }
-
-const CURR_BOT_ID =
-  "0x9f692c9372a1bbef92992ef8dbdb4d9015362e6342ae20b3831ece1fca89ea67";
 
 export function provideHandleBlock_L1(
   daiL1Address: string,

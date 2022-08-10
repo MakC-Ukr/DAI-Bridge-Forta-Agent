@@ -11,6 +11,9 @@ const ERC20_ABI: any[] = [
 
 const DAI_L2_ADDRESS = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1";
 
+const CURR_BOT_ID =
+  "0x9f692c9372a1bbef92992ef8dbdb4d9015362e6342ae20b3831ece1fca89ea67";
+
 function QUERY_API(botId: string, chainId: string) {
   let ret: string = `query recentAlerts {
     alerts(
@@ -105,4 +108,5 @@ export {
   API_URL,
   DAI_L2_ADDRESS,
   QUERY_API,
+  CURR_BOT_ID
 };
