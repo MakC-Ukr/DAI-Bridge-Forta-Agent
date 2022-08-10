@@ -12,11 +12,8 @@ import { JsonRpcProvider } from "@ethersproject/providers";
 
 let chainSpecificCache: number = 0;
 
-async function provideHandleBlock_OP(
-  erc20Abi: any[],
-  daiL2Address: string, blockEvent: BlockEvent
-) {
-  
+export function provideHandleBlock_OP(erc20Abi: any[], daiL2Address: string) {
+  return async (blockEvent: BlockEvent) => {
     let provider: JsonRpcProvider = getEthersProvider();
     const findings: Finding[] = [];
 
@@ -46,6 +43,9 @@ async function provideHandleBlock_OP(
     chainSpecificCache = L2_totalSupply;
 
     return findings;
-};
+  };
+}
 
-export default provideHandleBlock_OP;
+export default {
+  handleBlock: provideHandleBlock_OP(ERC20_ABI, DAI_L2_ADDRESS),
+};

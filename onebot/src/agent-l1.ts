@@ -10,11 +10,11 @@ import {
 import {
   QUERY_API,
   DAI_L1_ADDRESS,
-    ERC20_ABI,
-    L1_ESCROW_ADDRESS_ARB,
-    L1_ESCROW_ADDRESS_OP,
-    API_URL,
-    HEADERS,
+  ERC20_ABI,
+  L1_ESCROW_ADDRESS_ARB,
+  L1_ESCROW_ADDRESS_OP,
+  API_URL,
+  HEADERS,
 } from "./constants";
 import axios from "axios";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -40,8 +40,8 @@ export function provideHandleBlock_L1(
   l1EscrowAddressOp: string,
   apiUrl: string,
   headers: {}
-): HandleBlock{
-  return async (blockEvent: BlockEvent) => {
+): HandleBlock {
+  return async (_: BlockEvent) => {
     let provider: JsonRpcProvider = getEthersProvider();
 
     const findings: Finding[] = [];
@@ -102,8 +102,8 @@ export function provideHandleBlock_L1(
     }
 
     return findings;
-  }
   };
+}
 
 // export default provideHandleBlock_L1;
 export default {
@@ -113,6 +113,6 @@ export default {
     L1_ESCROW_ADDRESS_ARB,
     L1_ESCROW_ADDRESS_OP,
     API_URL,
-    HEADERS,
+    HEADERS
   ),
 };
