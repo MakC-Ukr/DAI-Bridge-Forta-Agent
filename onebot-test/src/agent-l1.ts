@@ -44,15 +44,17 @@ export function provideHandleBlock_L1(
   apiUrl: string,
   headers: {}
 ): HandleBlock {
-  return async (_: BlockEvent) => {
-    let provider: JsonRpcProvider = getEthersProvider();
+  return async (blockEvent: BlockEvent) => {
+    let currBlockTimeStamp = blockEvent.block.timestamp.toString();
+    currBlockTimeStamp += "0000"; // converting timestamp to milliseconds
 
+    let provider: JsonRpcProvider = getEthersProvider();
     const findings: Finding[] = [];
     let DAI_L1 = new ethers.Contract(daiL1Address, erc20Abi, provider);
     // Optimism
     let L1_escrowBal_OP = parseFloat(await DAI_L1.balanceOf(l1EscrowAddressOp));
     let l2_metadata_OP = (
-      await func(apiUrl, QUERY_API(CURR_BOT_ID, "10"), headers)
+      await func(apiUrl, QUERY_API(CURR_BOT_ID, "10", currBlockTimeStamp), headers)
     )["totalSupplyDai"];
 
     if (l2_metadata_OP != -1 && L1_escrowBal_OP >= l2_metadata_OP) {
@@ -80,7 +82,7 @@ export function provideHandleBlock_L1(
       await DAI_L1.balanceOf(l1EscrowAddressArb)
     );
     let l2_metadata_ARB = (
-      await func(apiUrl, QUERY_API(CURR_BOT_ID, "42161"), headers)
+      await func(apiUrl, QUERY_API(CURR_BOT_ID, "42161", currBlockTimeStamp), headers)
     )["totalSupplyDai"];
 
     if (l2_metadata_ARB != -1 && L1_escrowBal_ARB >= l2_metadata_ARB) {

@@ -19,13 +19,12 @@ import {
 } from "./constants";
 import axios from "axios";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import provideHandleBlock_ARB from "./agent-l2-arb";
-import provideHandleBlock_OP from "./agent-l2-op";
+import provideHandleBlock_L2 from "./agent-l2";
 import provideHandleBlock_L1 from "./agent-l1";
 import { NetworkManager } from "forta-agent-tools";
 
 interface NetworkData {
-  findingsArrayFunc: Promise<Finding[]>;
+  findingsArrayFunc: HandleBlock;
 }
 
 const data: Record<number, NetworkData> = {
@@ -33,10 +32,10 @@ const data: Record<number, NetworkData> = {
     findingsArrayFunc: provideHandleBlock_L1.handleBlock,
   },
   10: {
-    findingsArrayFunc: provideHandleBlock_OP.handleBlock,
+    findingsArrayFunc: provideHandleBlock_L2.handleBlock,
   },
   42161: {
-    findingsArrayFunc: provideHandleBlock_ARB.handleBlock,
+    findingsArrayFunc: provideHandleBlock_L2.handleBlock,
   },
 };
 
@@ -50,14 +49,25 @@ export const provideInitialize = (
   };
 };
 
-export function provideHandleBlock(): HandleBlock {
-  return async (_: BlockEvent) => {
-    await networkManagerCurr.init(getEthersProvider());
-    return networkManagerCurr.get("findingsArrayFunc");
+export const provideHandleBlock = (): HandleBlock => {
+  let handler: HandleBlock;
+
+  const delayedHandlerBuilder = (
+    blockEvent: BlockEvent
+  ): Promise<Finding[]> => {
+    handler = networkManagerCurr.get("findingsArrayFunc");
+    return handler(blockEvent);
   };
-}
+
+  const wrapper = (blockEvent: BlockEvent): Promise<Finding[]> => {
+    return handler(blockEvent);
+  };
+
+  handler = delayedHandlerBuilder;
+  return wrapper;
+};
 
 export default {
-  // initialize: provideInitialize(networkManagerCurr, getEthersProvider()),
+  initialize: provideInitialize(networkManagerCurr, getEthersProvider()),
   handleBlock: provideHandleBlock(),
 };

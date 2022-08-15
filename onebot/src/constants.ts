@@ -16,7 +16,7 @@ function QUERY_API(botId: string, chainId: string) {
     alerts(
       input: {
         first: 1
-        createdSince: 6000000
+        createdSince: 60000000
         bots: [
           "`;
   ret = ret + botId;

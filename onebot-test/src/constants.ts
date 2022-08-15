@@ -14,12 +14,16 @@ const DAI_L2_ADDRESS = "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1";
 const CURR_BOT_ID =
   "0x9f692c9372a1bbef92992ef8dbdb4d9015362e6342ae20b3831ece1fca89ea67";
 
-function QUERY_API(botId: string, chainId: string) {
+function QUERY_API(botId: string, chainId: string, endTimestamp: string) {
   let ret: string = `query recentAlerts {
     alerts(
       input: {
         first: 1
-        createdSince: 60000000
+        blockSortDirection: desc,
+        blockTimestampRange: {
+          startTimestamp: 1
+          endTimestamp: ` + endTimestamp + 
+        `},
         bots: [
           "`;
   ret = ret + botId;
