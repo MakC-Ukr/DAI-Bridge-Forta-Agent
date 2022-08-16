@@ -8,6 +8,7 @@ import {
   API_URL,
   HEADERS,
   CURR_BOT_ID,
+  getFindingL1,
 } from "./constants";
 import axios from "axios";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -36,57 +37,36 @@ export function provideHandleBlock_L1(
   apiUrl: string,
   headers: {}
 ): HandleBlock {
+  
+  const chainSpecificQueryData: { l1EscrowAddress: string; chainId: string; chainName: string }[] = [
+    {
+      l1EscrowAddress: l1EscrowAddressOp,
+      chainId: "10",
+      chainName: "Optimism",
+    },
+    {
+      l1EscrowAddress: l1EscrowAddressArb,
+      chainId: "42161",
+      chainName: "Arbitrum",
+    },
+  ];
+
   return async (blockEvent: BlockEvent) => {
     let currBlockTimeStamp = blockEvent.block.timestamp.toString();
     currBlockTimeStamp += "000"; // converting timestamp to milliseconds
     let provider: JsonRpcProvider = getEthersProvider();
     let findings: Finding[] = [];
     let DAI_L1 = new ethers.Contract(daiL1Address, erc20Abi, provider);
-    // Optimism
-    let L1_escrowBal_OP = parseFloat(await DAI_L1.balanceOf(l1EscrowAddressOp));
-    let l2_metadata_OP = (await func(apiUrl, QUERY_API(CURR_BOT_ID, "10", currBlockTimeStamp), headers))[
-      "totalSupplyDai"
-    ];
 
-    if (l2_metadata_OP != -1 && L1_escrowBal_OP >= l2_metadata_OP) {
-      findings.push(
-        Finding.fromObject({
-          name: "dai-bridge-bot",
-          description: "DAI balance of L1 escrow for " + "OP" + " DAI bridge less than DAI supply on L2",
-          alertId: "DAI_BALANCE-1",
-          severity: FindingSeverity.High,
-          type: FindingType.Exploit,
-          protocol: "MakerDAO (mainnet)",
-          metadata: {
-            escrowBal: L1_escrowBal_OP.toString(),
-            L2_chainName: "Optimism",
-            l2_totalSupply: l2_metadata_OP.toString(),
-          },
-        })
-      );
-    }
-    // ARBITRUM
-    let L1_escrowBal_ARB = parseFloat(await DAI_L1.balanceOf(l1EscrowAddressArb));
-    let l2_metadata_ARB = (await func(apiUrl, QUERY_API(CURR_BOT_ID, "42161", currBlockTimeStamp), headers))[
-      "totalSupplyDai"
-    ];
-
-    if (l2_metadata_ARB != -1 && L1_escrowBal_ARB >= l2_metadata_ARB) {
-      findings.push(
-        Finding.fromObject({
-          name: "dai-bridge-bot",
-          description: "DAI balance of L1 escrow for " + "ARB" + " DAI bridge less than DAI supply on L2",
-          alertId: "DAI_BALANCE-1",
-          severity: FindingSeverity.High,
-          type: FindingType.Exploit,
-          protocol: "MakerDAO (mainnet)",
-          metadata: {
-            escrowBal: L1_escrowBal_ARB.toString(),
-            L2_chainName: "Arbitrum",
-            l2_totalSupply: l2_metadata_ARB.toString(),
-          },
-        })
-      );
+    for (let i = 0; i <= 1; i++) {
+      let currData: { l1EscrowAddress: string; chainId: string; chainName: string } = chainSpecificQueryData[i];
+      let L1_escrowBal = parseFloat(await DAI_L1.balanceOf(currData.l1EscrowAddress));
+      let l2_metadata = (await func(apiUrl, QUERY_API(CURR_BOT_ID, currData.chainId, currBlockTimeStamp), headers))[
+        "totalSupplyDai"
+      ];
+      if (l2_metadata != -1 && L1_escrowBal >= l2_metadata) {
+        findings.push(getFindingL1(L1_escrowBal.toString(), l2_metadata.toString(), currData.chainName));
+      }
     }
 
     return findings;
