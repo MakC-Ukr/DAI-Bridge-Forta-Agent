@@ -4,21 +4,9 @@ import {
   HandleBlock,
   getEthersProvider,
   ethers,
-  Initialize,
-  FindingType,
-  FindingSeverity,
+  Initialize
 } from "forta-agent";
-import {
-  DAI_L1_ADDRESS,
-  ERC20_ABI,
-  L1_ESCROW_ADDRESS_ARB,
-  L1_ESCROW_ADDRESS_OP,
-  API_URL,
-  HEADERS,
-  DAI_L2_ADDRESS,
-} from "./constants";
-import axios from "axios";
-import { JsonRpcProvider } from "@ethersproject/providers";
+
 import provideHandleBlock_L2 from "./agent-l2";
 import provideHandleBlock_L1 from "./agent-l1";
 import { NetworkManager } from "forta-agent-tools";
@@ -52,9 +40,7 @@ export const provideInitialize = (
 export const provideHandleBlock = (): HandleBlock => {
   let handler: HandleBlock;
 
-  const delayedHandlerBuilder = (
-    blockEvent: BlockEvent
-  ): Promise<Finding[]> => {
+  const delayedHandlerBuilder = (blockEvent: BlockEvent): Promise<Finding[]> => {
     handler = networkManagerCurr.get("findingsArrayFunc");
     return handler(blockEvent);
   };

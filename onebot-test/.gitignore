@@ -1,3 +1,7 @@
 node_modules
 dist
 forta.config.json
+src/dataLocal
+src/temp.js
+src/temp.ts
+src/constants.js

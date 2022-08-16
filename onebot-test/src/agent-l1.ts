@@ -1,12 +1,4 @@
-import {
-  Finding,
-  FindingSeverity,
-  FindingType,
-  getEthersProvider,
-  ethers,
-  HandleBlock,
-  BlockEvent,
-} from "forta-agent";
+import { Finding, FindingSeverity, FindingType, getEthersProvider, ethers, HandleBlock, BlockEvent } from "forta-agent";
 import {
   QUERY_API,
   DAI_L1_ADDRESS,
@@ -15,7 +7,7 @@ import {
   L1_ESCROW_ADDRESS_OP,
   API_URL,
   HEADERS,
-  CURR_BOT_ID
+  CURR_BOT_ID,
 } from "./constants";
 import axios from "axios";
 import { JsonRpcProvider } from "@ethersproject/providers";
@@ -46,25 +38,23 @@ export function provideHandleBlock_L1(
 ): HandleBlock {
   return async (blockEvent: BlockEvent) => {
     let currBlockTimeStamp = blockEvent.block.timestamp.toString();
-    currBlockTimeStamp += "0000"; // converting timestamp to milliseconds
-
+    currBlockTimeStamp += "000"; // converting timestamp to milliseconds
+    console.log(currBlockTimeStamp);
     let provider: JsonRpcProvider = getEthersProvider();
-    const findings: Finding[] = [];
+    let findings: Finding[] = [];
     let DAI_L1 = new ethers.Contract(daiL1Address, erc20Abi, provider);
     // Optimism
     let L1_escrowBal_OP = parseFloat(await DAI_L1.balanceOf(l1EscrowAddressOp));
-    let l2_metadata_OP = (
-      await func(apiUrl, QUERY_API(CURR_BOT_ID, "10", currBlockTimeStamp), headers)
-    )["totalSupplyDai"];
+    let l2_metadata_OP = (await func(apiUrl, QUERY_API(CURR_BOT_ID, "10", currBlockTimeStamp), headers))[
+      "totalSupplyDai"
+    ];
 
     if (l2_metadata_OP != -1 && L1_escrowBal_OP >= l2_metadata_OP) {
+      console.log(await func(apiUrl, QUERY_API(CURR_BOT_ID, "10", currBlockTimeStamp), headers));
       findings.push(
         Finding.fromObject({
           name: "dai-bridge-bot",
-          description:
-            "DAI balance of L1 escrow for " +
-            "OP" +
-            " DAI bridge less than DAI supply on L2",
+          description: "DAI balance of L1 escrow for " + "OP" + " DAI bridge less than DAI supply on L2",
           alertId: "DAI_BALANCE-1",
           severity: FindingSeverity.High,
           type: FindingType.Exploit,
@@ -78,21 +68,16 @@ export function provideHandleBlock_L1(
       );
     }
     // ARBITRUM
-    let L1_escrowBal_ARB = parseFloat(
-      await DAI_L1.balanceOf(l1EscrowAddressArb)
-    );
-    let l2_metadata_ARB = (
-      await func(apiUrl, QUERY_API(CURR_BOT_ID, "42161", currBlockTimeStamp), headers)
-    )["totalSupplyDai"];
+    let L1_escrowBal_ARB = parseFloat(await DAI_L1.balanceOf(l1EscrowAddressArb));
+    let l2_metadata_ARB = (await func(apiUrl, QUERY_API(CURR_BOT_ID, "42161", currBlockTimeStamp), headers))[
+      "totalSupplyDai"
+    ];
 
     if (l2_metadata_ARB != -1 && L1_escrowBal_ARB >= l2_metadata_ARB) {
       findings.push(
         Finding.fromObject({
           name: "dai-bridge-bot",
-          description:
-            "DAI balance of L1 escrow for " +
-            "ARB" +
-            " DAI bridge less than DAI supply on L2",
+          description: "DAI balance of L1 escrow for " + "ARB" + " DAI bridge less than DAI supply on L2",
           alertId: "DAI_BALANCE-1",
           severity: FindingSeverity.High,
           type: FindingType.Exploit,
@@ -105,7 +90,7 @@ export function provideHandleBlock_L1(
         })
       );
     }
-    // RETURN
+
     return findings;
   };
 }

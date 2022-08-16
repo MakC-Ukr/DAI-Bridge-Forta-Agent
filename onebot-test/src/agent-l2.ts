@@ -1,21 +1,10 @@
-import {
-  BlockEvent,
-  Finding,
-  HandleBlock,
-  FindingSeverity,
-  FindingType,
-  getEthersProvider,
-  ethers,
-} from "forta-agent";
+import { BlockEvent, Finding, HandleBlock, FindingSeverity, FindingType, getEthersProvider, ethers } from "forta-agent";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { DAI_L2_ADDRESS, ERC20_ABI } from "./constants";
 
 let chainSpecificCache: number = 0;
 
-export function provideHandleBlock_L2(
-  erc20Abi: any[],
-  daiL2Address: string
-): HandleBlock {
+export function provideHandleBlock_L2(erc20Abi: any[], daiL2Address: string): HandleBlock {
   return async (_: BlockEvent) => {
     let provider: JsonRpcProvider = getEthersProvider();
     const findings: Finding[] = [];
