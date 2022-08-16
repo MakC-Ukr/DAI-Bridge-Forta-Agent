@@ -53,28 +53,6 @@ function QUERY_API(botId: string, chainId: string, endTimestamp: string) {
 }
 
 
-const QUERY_ARB: string = `query recentAlerts {
-  alerts(
-    input: {
-      first: 1
-      bots: [
-        "0xc33cfbe2c914e3d3c760ed46e8a546a3e3ccaa263a9a4e357bd5b7d877b49e9e"
-      ]
-      chainId: 42161
-    }
-  ) {
-    pageInfo {
-      hasNextPage
-    }
-    alerts {
-      createdAt
-      name
-      protocol
-      metadata
-    }
-  }
-}
-`;
 
 const HEADERS: {} = {
   "content-type": "application/json",
@@ -85,7 +63,6 @@ export {
   ERC20_ABI,
   L1_ESCROW_ADDRESS_ARB,
   L1_ESCROW_ADDRESS_OP,
-  QUERY_ARB,
   HEADERS,
   API_URL,
   DAI_L2_ADDRESS,

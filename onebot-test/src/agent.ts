@@ -11,7 +11,7 @@ import provideHandleBlock_L2 from "./agent-l2";
 import provideHandleBlock_L1 from "./agent-l1";
 import { NetworkManager } from "forta-agent-tools";
 
-interface NetworkData {
+export interface NetworkData {
   findingsArrayFunc: HandleBlock;
 }
 
@@ -37,7 +37,7 @@ export const provideInitialize = (
   };
 };
 
-export const provideHandleBlock = (): HandleBlock => {
+export const provideHandleBlock = (networkManagerCurr: NetworkManager<NetworkData>  ): HandleBlock => {
   let handler: HandleBlock;
 
   const delayedHandlerBuilder = (blockEvent: BlockEvent): Promise<Finding[]> => {
@@ -55,5 +55,5 @@ export const provideHandleBlock = (): HandleBlock => {
 
 export default {
   initialize: provideInitialize(networkManagerCurr, getEthersProvider()),
-  handleBlock: provideHandleBlock(),
+  handleBlock: provideHandleBlock(networkManagerCurr),
 };

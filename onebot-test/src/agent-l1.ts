@@ -39,7 +39,6 @@ export function provideHandleBlock_L1(
   return async (blockEvent: BlockEvent) => {
     let currBlockTimeStamp = blockEvent.block.timestamp.toString();
     currBlockTimeStamp += "000"; // converting timestamp to milliseconds
-    console.log(currBlockTimeStamp);
     let provider: JsonRpcProvider = getEthersProvider();
     let findings: Finding[] = [];
     let DAI_L1 = new ethers.Contract(daiL1Address, erc20Abi, provider);
@@ -50,7 +49,6 @@ export function provideHandleBlock_L1(
     ];
 
     if (l2_metadata_OP != -1 && L1_escrowBal_OP >= l2_metadata_OP) {
-      console.log(await func(apiUrl, QUERY_API(CURR_BOT_ID, "10", currBlockTimeStamp), headers));
       findings.push(
         Finding.fromObject({
           name: "dai-bridge-bot",
