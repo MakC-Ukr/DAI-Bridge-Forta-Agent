@@ -27,15 +27,25 @@ describe("DAI supply underflow detection bot", () => {
     })
     .setLatestBlock(20);
 
+  let handleBlock_l2: HandleBlock = provideHandleBlock_L2(ERC20_ABI, MOCK_DAI_L2_ADDR);
+  let handleBlock: HandleBlock = provideHandleBlock(networkManager_OP);
+
   let handleInit: Initialize = provideInitialize(
     networkManager_OP,
     mockProvider as unknown as ethers.providers.Provider
   );
-  let handleBlock: HandleBlock = provideHandleBlock(networkManager_OP);
+
+  it("returns a finding on Optimism when first deployed", async () => {
+    // await handleInit();
+    const blockEvent: BlockEvent = new TestBlockEvent().setNumber(20);
+    console.log(await handleBlock_l2(blockEvent));
+  });
 
   it("returns a finding on Optimism when first deployed", async () => {
     await handleInit();
     const blockEvent: BlockEvent = new TestBlockEvent().setNumber(20);
     console.log(await handleBlock(blockEvent));
   });
+
+
 });
