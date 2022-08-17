@@ -5,10 +5,10 @@ import { NetworkData, provideHandleBlock, provideInitialize } from "./agent";
 import { provideHandleBlock_L1 } from "./agent-l1";
 import { provideHandleBlock_L2 } from "./agent-l2";
 import { API_URL, ERC20_ABI, HEADERS } from "./constants";
-import { utils } from "ethers";
+import { ethers, utils } from "ethers";
 
 const MOCK_DAI_L2_ADDR: string = createAddress("0x81");
-const iface: utils.Interface = new utils.Interface(ERC20_ABI);
+const iface: utils.Interface = new utils.Interface(["function totalSupply() view returns (uint)"]);
 
 const TEST_NM_DATA: Record<number, NetworkData> = {
   1010: {
@@ -20,16 +20,21 @@ describe("DAI supply underflow detection bot", () => {
   const networkManager_OP = new NetworkManager(TEST_NM_DATA);
   networkManager_OP.setNetwork(1010);
 
-  let mockProvider = new MockEthersProvider().addCallTo(MOCK_DAI_L2_ADDR, 20, iface, "totalSupply", {
-    inputs: [],
-    outputs: [123],
-  });
+  let mockProvider = new MockEthersProvider()
+    .addCallTo(MOCK_DAI_L2_ADDR, 20, iface, "totalSupply", {
+      inputs: [],
+      outputs: [123],
+    })
+    .setLatestBlock(20);
 
-  let handleInit: any = provideInitialize;
+  let handleInit: Initialize = provideInitialize(
+    networkManager_OP,
+    mockProvider as unknown as ethers.providers.Provider
+  );
   let handleBlock: HandleBlock = provideHandleBlock(networkManager_OP);
 
   it("returns a finding on Optimism when first deployed", async () => {
-    await handleInit(networkManager_OP, mockProvider);
+    await handleInit();
     const blockEvent: BlockEvent = new TestBlockEvent().setNumber(20);
     console.log(await handleBlock(blockEvent));
   });
