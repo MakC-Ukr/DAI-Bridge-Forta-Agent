@@ -56,17 +56,29 @@ export function provideHandleBlock_L1(
     currBlockTimeStamp += "000"; // converting timestamp to milliseconds
     let findings: Finding[] = [];
     let DAI_L1 = new ethers.Contract(daiL1Address, erc20Abi, provider);
-
+    
     for (let i = 0; i <= chainSpecificQueryData.length - 1; i++) {
       let currData: { l1EscrowAddress: string; chainId: string; chainName: string } = chainSpecificQueryData[i];
-      let L1_escrowBal = parseFloat(await DAI_L1.balanceOf(currData.l1EscrowAddress));
+      // console.log("currBlockTimeStamp: ", currBlockTimeStamp);
+      // console.log("daiL1Address: ", daiL1Address);
+      // console.log("currData: ", currData);
+      // console.log("provider.getBlockNumber: ", await provider.getBlockNumber());
+      // console.log("DAI_L1.totalSupply: ", (await DAI_L1.totalSupply({ blockTag: blockEvent.blockNumber })).toString())
+      // console.log("DAI_L1.totalSupply: ", (await DAI_L1.totalSupply({ blockTag: blockEvent.blockNumber })).toString())
+      // let res = ;
+
+      // console.log("l1escrow balance: ", res.toString());
+      let L1_escrowBal = parseFloat(await DAI_L1.balanceOf(currData.l1EscrowAddress, { blockTag: blockEvent.blockNumber }));
+      console.log("OK 2");
       let l2_metadata = (await func(apiUrl, QUERY_API(CURR_BOT_ID, currData.chainId, currBlockTimeStamp), headers))[
         "totalSupplyDai"
       ];
+      console.log("l2_metadata: ",l2_metadata);
       if (l2_metadata != -1 && L1_escrowBal >= l2_metadata) {
         findings.push(getFindingL1(L1_escrowBal.toString(), l2_metadata.toString(), currData.chainName));
       }
     }
+    console.log("OK 4");
 
     return findings;
   };
