@@ -2,9 +2,8 @@ import { BlockEvent, HandleBlock } from "forta-agent";
 import { MockEthersProvider, TestBlockEvent } from "forta-agent-tools/lib/test";
 import { provideHandleBlock_L1 } from "./agent-l1";
 import { provideHandleBlock_L2 } from "./agent-l2";
-import { API_URL, ERC20_ABI, HEADERS, INITIAL_PREV_SUPPLY_FOR_L2 } from "./constants";
+import { API_URL, ERC20_ABI, HEADERS, INITIAL_PREV_SUPPLY_FOR_L2, getFindingL2, getFindingL1 } from "./constants";
 import { ethers } from "ethers";
-import { getFindingL2, getFindingL1 } from "./constants";
 import {
   FIRST_TEST_BLOCK_NUMBER,
   iface,
