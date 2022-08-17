@@ -4,9 +4,12 @@ import { DAI_L2_ADDRESS, ERC20_ABI } from "./constants";
 
 let chainSpecificCache: number = 0;
 
-export function provideHandleBlock_L2(erc20Abi: any[], daiL2Address: string): HandleBlock {
+export function provideHandleBlock_L2(
+  erc20Abi: any[],
+  daiL2Address: string,
+  provider: ethers.providers.JsonRpcProvider
+): HandleBlock {
   return async (blockEvent: BlockEvent) => {
-    let provider: JsonRpcProvider = getEthersProvider();
     const findings: Finding[] = [];
 
     let DAI_L2 = new ethers.Contract(daiL2Address, erc20Abi, provider);
@@ -34,5 +37,5 @@ export function provideHandleBlock_L2(erc20Abi: any[], daiL2Address: string): Ha
 }
 
 export default {
-  handleBlock: provideHandleBlock_L2(ERC20_ABI, DAI_L2_ADDRESS),
+  handleBlock: provideHandleBlock_L2(ERC20_ABI, DAI_L2_ADDRESS, getEthersProvider()),
 };
