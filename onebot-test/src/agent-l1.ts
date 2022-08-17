@@ -35,9 +35,9 @@ export function provideHandleBlock_L1(
   l1EscrowAddressArb: string,
   l1EscrowAddressOp: string,
   apiUrl: string,
-  headers: {}
+  headers: {},
+  provider: JsonRpcProvider
 ): HandleBlock {
-  
   const chainSpecificQueryData: { l1EscrowAddress: string; chainId: string; chainName: string }[] = [
     {
       l1EscrowAddress: l1EscrowAddressOp,
@@ -54,11 +54,10 @@ export function provideHandleBlock_L1(
   return async (blockEvent: BlockEvent) => {
     let currBlockTimeStamp = blockEvent.block.timestamp.toString();
     currBlockTimeStamp += "000"; // converting timestamp to milliseconds
-    let provider: JsonRpcProvider = getEthersProvider();
     let findings: Finding[] = [];
     let DAI_L1 = new ethers.Contract(daiL1Address, erc20Abi, provider);
 
-    for (let i = 0; i <= 1; i++) {
+    for (let i = 0; i <= chainSpecificQueryData.length - 1; i++) {
       let currData: { l1EscrowAddress: string; chainId: string; chainName: string } = chainSpecificQueryData[i];
       let L1_escrowBal = parseFloat(await DAI_L1.balanceOf(currData.l1EscrowAddress));
       let l2_metadata = (await func(apiUrl, QUERY_API(CURR_BOT_ID, currData.chainId, currBlockTimeStamp), headers))[
@@ -80,6 +79,7 @@ export default {
     L1_ESCROW_ADDRESS_ARB,
     L1_ESCROW_ADDRESS_OP,
     API_URL,
-    HEADERS
+    HEADERS,
+    getEthersProvider()
   ),
 };

@@ -5,12 +5,12 @@ import { DAI_L2_ADDRESS, ERC20_ABI } from "./constants";
 let chainSpecificCache: number = 0;
 
 export function provideHandleBlock_L2(erc20Abi: any[], daiL2Address: string): HandleBlock {
-  return async (_: BlockEvent) => {
+  return async (blockEvent: BlockEvent) => {
     let provider: JsonRpcProvider = getEthersProvider();
     const findings: Finding[] = [];
 
     let DAI_L2 = new ethers.Contract(daiL2Address, erc20Abi, provider);
-    let L2_totalSupply = parseFloat(await DAI_L2.totalSupply());
+    let L2_totalSupply = parseFloat(await DAI_L2.totalSupply({ blockTag: blockEvent.blockNumber }));
     if (chainSpecificCache != L2_totalSupply) {
       findings.push(
         Finding.fromObject({
