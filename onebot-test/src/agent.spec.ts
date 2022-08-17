@@ -10,15 +10,8 @@ import { ethers, utils } from "ethers";
 const MOCK_DAI_L2_ADDR: string = createAddress("0x81");
 const iface: utils.Interface = new utils.Interface(["function totalSupply() view returns (uint)"]);
 
-const TEST_NM_DATA: Record<number, NetworkData> = {
-  1010: {
-    findingsArrayFunc: provideHandleBlock_L2(ERC20_ABI, MOCK_DAI_L2_ADDR),
-  },
-};
-
 describe("DAI supply underflow detection bot", () => {
-  const networkManager_OP = new NetworkManager(TEST_NM_DATA);
-  networkManager_OP.setNetwork(1010);
+
 
   let mockProvider = new MockEthersProvider()
     .addCallTo(MOCK_DAI_L2_ADDR, 20, iface, "totalSupply", {
@@ -27,7 +20,24 @@ describe("DAI supply underflow detection bot", () => {
     })
     .setLatestBlock(20);
 
-  let handleBlock_l2: HandleBlock = provideHandleBlock_L2(ERC20_ABI, MOCK_DAI_L2_ADDR);
+  const TEST_NM_DATA: Record<number, NetworkData> = {
+    1010: {
+      findingsArrayFunc: provideHandleBlock_L2(
+        ERC20_ABI,
+        MOCK_DAI_L2_ADDR,
+        mockProvider as unknown as ethers.providers.JsonRpcProvider
+      ),
+    },
+  };
+
+  const networkManager_OP = new NetworkManager(TEST_NM_DATA);
+  networkManager_OP.setNetwork(1010);
+
+  let handleBlock_l2: HandleBlock = provideHandleBlock_L2(
+    ERC20_ABI,
+    MOCK_DAI_L2_ADDR,
+    mockProvider as unknown as ethers.providers.JsonRpcProvider
+  );
   let handleBlock: HandleBlock = provideHandleBlock(networkManager_OP);
 
   let handleInit: Initialize = provideInitialize(
@@ -40,12 +50,5 @@ describe("DAI supply underflow detection bot", () => {
     const blockEvent: BlockEvent = new TestBlockEvent().setNumber(20);
     console.log(await handleBlock_l2(blockEvent));
   });
-
-  it("returns a finding on Optimism when first deployed", async () => {
-    await handleInit();
-    const blockEvent: BlockEvent = new TestBlockEvent().setNumber(20);
-    console.log(await handleBlock(blockEvent));
-  });
-
 
 });
