@@ -70,9 +70,26 @@ function getFindingL1(escrowBal: string, l2Supply: string, chainName: string) {
   });
 }
 
+function getFindingL2(prevSupp: string, totalDaiSupp: string) {
+  return Finding.fromObject({
+    alertId: "L2_DAI_SUPPLY",
+    description: "Returns the total supply of L2 DAI tokens",
+    metadata: {
+      prevTotalSupply: prevSupp,
+      totalSupplyDAI: totalDaiSupp,
+    },
+    name: "DAI-balance-update",
+    protocol: "MakerDAO",
+    severity: FindingSeverity.Low,
+    type: FindingType.Info,
+  });
+}
+
 const HEADERS: {} = {
   "content-type": "application/json",
 };
+
+const INITIAL_PREV_SUPPLY_FOR_L2 = 0;
 
 export {
   DAI_L1_ADDRESS,
@@ -85,4 +102,6 @@ export {
   QUERY_API,
   CURR_BOT_ID,
   getFindingL1,
+  getFindingL2,
+  INITIAL_PREV_SUPPLY_FOR_L2,
 };

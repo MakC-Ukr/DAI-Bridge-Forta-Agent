@@ -1,8 +1,8 @@
 import { BlockEvent, Finding, HandleBlock, FindingSeverity, FindingType, getEthersProvider, ethers } from "forta-agent";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { DAI_L2_ADDRESS, ERC20_ABI } from "./constants";
+import { DAI_L2_ADDRESS, ERC20_ABI, getFindingL2, INITIAL_PREV_SUPPLY_FOR_L2 } from "./constants";
 
-let chainSpecificCache: number = 0;
+let chainSpecificCache: number = INITIAL_PREV_SUPPLY_FOR_L2;
 
 export function provideHandleBlock_L2(
   erc20Abi: any[],
@@ -15,20 +15,7 @@ export function provideHandleBlock_L2(
     let DAI_L2 = new ethers.Contract(daiL2Address, erc20Abi, provider);
     let L2_totalSupply = parseFloat(await DAI_L2.totalSupply({ blockTag: blockEvent.blockNumber }));
     if (chainSpecificCache != L2_totalSupply) {
-      findings.push(
-        Finding.fromObject({
-          name: "DAI-balance-update",
-          description: `Returns the total supply of L2 DAI tokens`,
-          alertId: "L2_DAI_SUPPLY",
-          severity: FindingSeverity.Low,
-          type: FindingType.Info,
-          protocol: "MakerDAO",
-          metadata: {
-            totalSupplyDAI: L2_totalSupply.toString(),
-            prevTotalSupply: chainSpecificCache.toString(),
-          },
-        })
-      );
+      findings.push(getFindingL2(chainSpecificCache.toString(), L2_totalSupply.toString()));
       chainSpecificCache = L2_totalSupply;
     }
 
