@@ -8,7 +8,6 @@ import {
   getFindingL1,
   iface,
   L2_ESCROW_BALANCES_ARR,
-  L2_SUPPLY_ARR,
   MOCK_DAI_L1_ADDR,
   MOCK_L1_ESCROW_ARB,
   MOCK_L1_ESCROW_OP,
