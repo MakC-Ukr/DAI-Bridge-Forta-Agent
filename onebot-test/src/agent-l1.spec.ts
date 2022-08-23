@@ -11,7 +11,7 @@ import {
   MOCK_DAI_L1_ADDR,
   MOCK_L1_ESCROW_ARB,
   MOCK_L1_ESCROW_OP,
-  MOCK_FETCHER_DATA
+  MOCK_FETCHER_DATA,
 } from "./utils";
 import { ethers } from "ethers";
 
