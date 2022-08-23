@@ -1,4 +1,7 @@
+import axios from "axios";
+import { utils } from "ethers";
 import { Finding, FindingSeverity, FindingType } from "forta-agent";
+import { createAddress } from "forta-agent-tools";
 
 const DAI_L1_ADDRESS: string = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
 const L1_ESCROW_ADDRESS_OP: string = "0x467194771dAe2967Aef3ECbEDD3Bf9a310C76C65";
@@ -91,6 +94,27 @@ const HEADERS: {} = {
 
 const INITIAL_PREV_SUPPLY_FOR_L2 = 0;
 
+class Fetcher {
+  getAlertData(apiUrl: string, querySent: string, headers: {}) {
+    async function func(apiUrl: string, querySent: string, headers: {}) {
+      const resp = await axios.post(
+        apiUrl,
+        {
+          query: querySent,
+        },
+        { headers: headers }
+      );
+
+      const alerts: [] = resp["data"]["data"]["alerts"]["alerts"];
+      if (alerts.length === 0) {
+        return { totalSupplyDai: -1 };
+      }
+      return resp["data"]["data"]["alerts"]["alerts"][0]["metadata"];
+    }
+    return func(apiUrl, querySent, headers);
+  }
+}
+
 export {
   DAI_L1_ADDRESS,
   ERC20_ABI,
@@ -104,4 +128,17 @@ export {
   getFindingL1,
   getFindingL2,
   INITIAL_PREV_SUPPLY_FOR_L2,
+  Fetcher,
 };
+
+// constants needed for tests
+
+export const MOCK_FETCHER_DATA = "456";
+export const MOCK_DAI_L2_ADDR: string = createAddress("0x81");
+export const MOCK_DAI_L1_ADDR: string = createAddress("0x29");
+export const MOCK_L1_ESCROW_OP: string = createAddress("0x03");
+export const MOCK_L1_ESCROW_ARB: string = createAddress("0x57");
+export const iface: utils.Interface = new utils.Interface(ERC20_ABI);
+export const FIRST_TEST_BLOCK_NUMBER = 20;
+export const L2_SUPPLY_ARR: number[] = [123, 420];
+export const L2_ESCROW_BALANCES_ARR: number[] = [500, 400];

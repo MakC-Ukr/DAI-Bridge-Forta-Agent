@@ -8,31 +8,10 @@ import {
   API_URL,
   HEADERS,
   CURR_BOT_ID,
+  Fetcher,
   getFindingL1,
-} from "./constants";
-import axios from "axios";
+} from "./utils";
 import { JsonRpcProvider } from "@ethersproject/providers";
-
-class Fetcher {
-  getAlertData(apiUrl: string, querySent: string, headers: {}) {
-    async function func(apiUrl: string, querySent: string, headers: {}) {
-      const resp = await axios.post(
-        apiUrl,
-        {
-          query: querySent,
-        },
-        { headers: headers }
-      );
-
-      const alerts: [] = resp["data"]["data"]["alerts"]["alerts"];
-      if (alerts.length === 0) {
-        return { totalSupplyDai: -1 };
-      }
-      return resp["data"]["data"]["alerts"]["alerts"][0]["metadata"];
-    }
-    return func(apiUrl, querySent, headers);
-  }
-}
 
 export function provideHandleBlock_L1(
   daiL1Address: string,

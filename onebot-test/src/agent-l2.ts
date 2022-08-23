@@ -1,6 +1,5 @@
-import { BlockEvent, Finding, HandleBlock, FindingSeverity, FindingType, getEthersProvider, ethers } from "forta-agent";
-import { JsonRpcProvider } from "@ethersproject/providers";
-import { DAI_L2_ADDRESS, ERC20_ABI, getFindingL2, INITIAL_PREV_SUPPLY_FOR_L2 } from "./constants";
+import { BlockEvent, Finding, HandleBlock, getEthersProvider, ethers } from "forta-agent";
+import { DAI_L2_ADDRESS, ERC20_ABI, getFindingL2, INITIAL_PREV_SUPPLY_FOR_L2 } from "./utils";
 
 let chainSpecificCache: number = INITIAL_PREV_SUPPLY_FOR_L2;
 
